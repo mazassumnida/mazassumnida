@@ -22,11 +22,7 @@ def calculate_percentage(now_exp):
                 temp = now_exp - accumulate[i - 1]
                 break
             i += 1
-
         need_exp = accumulate[i] - accumulate[i - 1]
-
-        print(temp, need_exp)
-
         now_percentage = int(temp / need_exp * 100)
 
         return now_percentage
