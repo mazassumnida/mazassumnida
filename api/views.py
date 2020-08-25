@@ -88,12 +88,9 @@ def generate_badge(request):
     xmlns="http://www.w3.org/2000/svg" 
     xmlns:xlink="http://www.w3.org/1999/xlink" 
     xml:space="preserve">
+    <defs>
     <style type="text/css">
         <![CDATA[
-            @font-face {{
-                font-family: "Caveat";
-                src: url("data:application/font-woff;charset=utf-8;base64,...");
-            }}
             @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=block');
             @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=block');
             @import url('https://fonts.googleapis.com/css2?family=Baloo+Tamma+2&display=block');
@@ -136,7 +133,6 @@ def generate_badge(request):
             }}
         ]]>
     </style>
-    <defs>
         <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="35%">
             <stop offset="10%" style="stop-color:{color1};stop-opacity:1" />
             <stop offset="55%" style="stop-color:{color2};stop-opacity:1" />
