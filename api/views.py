@@ -53,7 +53,7 @@ def generate_badge(request):
     }
 
     api_server = os.environ['API_SERVER']
-    boj_handle = request.GET.get("boj", "koosaga")
+    boj_handle = request.GET.get("boj", "ccoco")
 
     user_information_url = api_server + '/v2/users/show.json?id=' + boj_handle
     json = requests.get(user_information_url).json()
@@ -75,7 +75,7 @@ def generate_badge(request):
     
     if TIERS[level] == 'Unrated':
         tier_title = TIERS[level]
-        tier_rank = 0
+        tier_rank = ''
     else:
         tier_title, tier_rank = TIERS[level].split()    
     
@@ -90,9 +90,7 @@ def generate_badge(request):
     xml:space="preserve">
     <style type="text/css">
         <![CDATA[
-            @import url('http://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=block');
-            @import url('http://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=block');
-            @import url('http://fonts.googleapis.com/css2?family=Baloo+Tamma+2&display=block');
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=block');
             .background {{
                 fill: url(#grad);
             }}
@@ -105,30 +103,28 @@ def generate_badge(request):
                 font-size: 1.45em;
             }}
             text.tier-text {{
-                font-family: 'Caveat', cursive;
-                font-size: 2em;
+              font-weight: 700;
+              font-size: 1.45em;
+              opacity: 55%;
             }}
             text.tier-number {{
                 font-size: 3.1em;
                 font-weight: 700;
             }}
             .subtitle {{
-                font-weight: 400;
+                font-weight: 500;
                 font-size: 0.9em;
             }}
             .value {{
                 font-weight: 400;
                 font-size: 0.9em;
-                font-family: 'Baloo Tamma 2', cursive;
             }}
             .percentage {{
                 font-weight: 300;
                 font-size: 0.8em;
-                font-family: 'Baloo Tamma 2', cursive;
             }}
             .progress {{
                 font-size: 0.7em;
-                font-family: 'Baloo Tamma 2', cursive;
             }}
         ]]>
     </style>
@@ -140,18 +136,11 @@ def generate_badge(request):
         </linearGradient>
     </defs>
     <rect width="350" height="170" rx="10" ry="10" class="background"/>
-    <line x1="34" y1="50" x2="34" y2="105" stroke-width="2" stroke="white"/>
-    <line x1="100" y1="50" x2="100" y2="105" stroke-width="2" stroke="white"/>
-    <line x1="34" y1="105" x2="67" y2="125" stroke-width="2" stroke="white"/>
-    <line x1="100" y1="105" x2="67" y2="125" stroke-width="2" stroke="white"/>
-    <line x1="34" y1="110" x2="67" y2="130" stroke-width="2" stroke="white"/>
-    <line x1="100" y1="110" x2="67" y2="130" stroke-width="2" stroke="white"/>
-    <text x="145" y="50" class="boj-handle">{boj_handle}</text>
-    <text transform="translate(65, 40)" text-anchor="middle" alignment-baseline="middle" class="tier-text">{tier_title}</text>
-    <text x="52" y="100" class="tier-number">{tier_rank}</text>
-    <text x="145" y="78" class="subtitle">class</text><text x="245" y="78" class="class value">{boj_class}</text>
-    <text x="145" y="98" class="subtitle">solved</text><text x="245" y="98" class="solved value">{solved}</text>
-    <text x="145" y="118" class="subtitle">exp</text><text x="245" y="118" class="something value">{exp}</text>
+    <text x="315" y="50" class="tier-text" text-anchor="end">{tier_title}{tier_rank}</text>
+    <text x="35" y="50" class="boj-handle">{boj_handle}</text>
+    <text x="35" y="78" class="subtitle">class</text><text x="145" y="78" class="class value">{boj_class}</text>
+    <text x="35" y="98" class="subtitle">solved</text><text x="145" y="98" class="solved value">{solved}</text>
+    <text x="35" y="118" class="subtitle">exp</text><text x="145" y="118" class="something value">{exp}</text>
     <line x1="35" y1="142" x2="{bar_size}" y2="142" stroke-width="4" stroke="floralwhite" stroke-linecap="round"/>
     <line x1="35" y1="142" x2="290" y2="142" stroke-width="4" stroke-opacity="40%" stroke="floralwhite" stroke-linecap="round"/>
     <text x="297" y="142" alignment-baseline="middle" class="percentage">{percentage}%</text>
