@@ -1,7 +1,10 @@
 import os
 import requests
+import locale
 
 from django.http import HttpResponse
+
+locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
 # Create your views here.
 def generate_badge(request):
@@ -38,15 +41,26 @@ def generate_badge(request):
         "Ruby 2",
         "Ruby 1",
     )
+    
+    BACKGROUND_COLOR = {
+        'Bronze': '30deg, #F49347 20%, #984400 70%, #6E3100 100%',
+        'Silver': '30deg, rgb(208, 202, 213) 10%, rgb(107, 126, 145) 70%, rgb(50, 70, 90) 100%',
+        'Gold': '30deg, rgb(255, 201, 68) 30%, rgb(222, 130, 34) 100%, rgb(165, 95, 0) 100%',
+        'Platinum': '30deg, rgb(140, 197, 132) 40%, rgb(69, 178, 211) 100%, rgb(81, 167, 149) 100%',
+        'Diamond': '120deg, rgb(150, 184, 220) 10%, rgb(62, 165, 219) 60%, rgb(77, 99, 153) 100%',
+        'Ruby': '30deg, rgb(228, 91, 98) 40%, rgb(214, 28, 86) 100%, rgb(202, 0, 89) 100%'
+    }
 
     api_server = os.environ['API_SERVER']
-    boj_handle = request.GET.get("boj", "malkoring")
+    boj_handle = request.GET.get("boj", "koosaga")
 
     user_information_url = api_server + '/user_information.php?id=' + boj_handle
     json = requests.get(user_information_url).json()
     level = json['level']
-
-    tier, limit, *rest = [thres for thres in threshold if level <= thres]
+    solved = '{0:n}'.format(json['solved'])
+    boj_class = json['class']
+    exp = '{0:n}'.format(json['exp'])
+    
     tier_title, tier_rank = TIERS[level].split()    
     
     svg = '''
@@ -63,7 +77,7 @@ def generate_badge(request):
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap');
         :root {{
-            background-image: linear-gradient(30deg, rgb(140, 197, 132) 40%, rgb(69, 178, 211) 100%, rgb(81, 167, 149) 40%);
+            background-image: linear-gradient({background_color});
             background-repeat: no-repeat;
         }}
         text {{
@@ -72,39 +86,49 @@ def generate_badge(request):
         }}
         text.boj-handle {{
             font-weight: 700;
-            font-size: 1.5em;
+            font-size: 1.45em;
         }}
         text.tier-text {{
             font-family: 'Caveat', cursive;
             font-size: 2em;
         }}
         text.tier-number {{
-            font-size: 3.3em;
+            font-size: 3.1em;
             font-weight: 700;
         }}
         .subtitle {{
-            font-weight: 300;
+            font-weight: 400;
             font-size: 0.9em;
         }}
         .value {{
             font-weight: 400;
+            font-size: 0.9em;
+            text-anchor: "end";
         }}
         ]]>
     </style>
-    <line x1="30" y1="60" x2="30" y2="120" stroke-width="2" stroke="white"/>
-    <line x1="100" y1="60" x2="100" y2="120" stroke-width="2" stroke="white"/>
-    <line x1="30" y1="120" x2="65" y2="140" stroke-width="2" stroke="white"/>
-    <line x1="100" y1="120" x2="65" y2="140" stroke-width="2" stroke="white"/>
-    <line x1="30" y1="128" x2="65" y2="148" stroke-width="2" stroke="white"/>
-    <line x1="100" y1="128" x2="65" y2="148" stroke-width="2" stroke="white"/>
-    <text x="145" y="60" class="boj-handle">{boj_handle}</text>
-    <text transform="translate(62, 48)" text-anchor="middle" alignment-baseline="middle" class="tier-text">{tier_title}</text>
-    <text x="50" y="115" class="tier-number">{tier_rank}</text>
-    <text x="145" y="95" class="subtitle">solved</text><text x="260" y="95" class="solved value">291</text>
-    <text x="145" y="115" class="subtitle">class</text><text x="260" y="115" class="class value">3</text>
-    <text x="145" y="135" class="subtitle">something</text><text x="260" y="135" class="something value">merong</text>
+    <line x1="32" y1="60" x2="32" y2="115" stroke-width="2" stroke="white"/>
+    <line x1="98" y1="60" x2="98" y2="115" stroke-width="2" stroke="white"/>
+    <line x1="32" y1="115" x2="65" y2="135" stroke-width="2" stroke="white"/>
+    <line x1="98" y1="115" x2="65" y2="135" stroke-width="2" stroke="white"/>
+    <line x1="30" y1="121" x2="65" y2="141" stroke-width="2" stroke="white"/>
+    <line x1="98" y1="121" x2="65" y2="141" stroke-width="2" stroke="white"/>
+    <text x="145" y="57" class="boj-handle">{boj_handle}</text>
+    <text transform="translate(63, 46)" text-anchor="middle" alignment-baseline="middle" class="tier-text">{tier_title}</text>
+    <text x="50" y="110" class="tier-number">{tier_rank}</text>
+    <text x="145" y="90" class="subtitle">class</text><text x="250" y="90" class="class value">{boj_class}</text>
+    <text x="145" y="110" class="subtitle">solved</text><text x="250" y="110" class="solved value">{solved}</text>
+    <text x="145" y="130" class="subtitle">exp</text><text x="250" y="130" class="something value">{exp}</text>
+    <line x1="0" y1="167" x2="270" y2="167" stroke-width="6" stroke="floralwhite"/>
+    <line x1="0" y1="167" x2="350" y2="167" stroke-width="6" stroke-opacity="40%" stroke="floralwhite"/>
 </svg>
-    '''.format(boj_handle=boj_handle, tier_rank=tier_rank, tier_title=tier_title)
+    '''.format(background_color=BACKGROUND_COLOR[tier_title],
+               boj_handle=boj_handle,
+               tier_rank=tier_rank,
+               tier_title=tier_title,
+               solved=solved,
+               boj_class=boj_class,
+               exp=exp)
 
     response = HttpResponse(content=svg)
     response['Content-Type'] = 'image/svg+xml'
