@@ -103,9 +103,9 @@ def generate_badge(request):
                 font-size: 1.45em;
             }}
             text.tier-text {{
-                font-weight: 700;
-                font-size: 1.45em;
-                opacity: 55%;
+              font-weight: 700;
+              font-size: 1.45em;
+              opacity: 55%;
             }}
             text.tier-number {{
                 font-size: 3.1em;
@@ -158,7 +158,9 @@ def generate_badge(request):
                now_exp=now_exp,
                needed_exp=needed_exp,
                percentage=percentage,
-               bar_size=bar_size)
+               bar_size=bar_size,
+               font1=FONT1,
+               font2=FONT2)
 
     response = HttpResponse(content=svg)
     response['Content-Type'] = 'image/svg+xml'
