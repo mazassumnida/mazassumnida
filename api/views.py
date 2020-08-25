@@ -90,9 +90,9 @@ def generate_badge(request):
     xml:space="preserve">
     <style type="text/css">
         <![CDATA[
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Baloo+Tamma+2&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=block');
+        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=block');
+        @import url('https://fonts.googleapis.com/css2?family=Baloo+Tamma+2&display=block');
         .background {{
             fill: url(#grad);
         }}
