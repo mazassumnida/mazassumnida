@@ -43,25 +43,41 @@ def generate_badge(request):
     )
     
     BACKGROUND_COLOR = {
-        'Bronze': '30deg, #F49347 20%, #984400 70%, #6E3100 100%',
-        'Silver': '30deg, rgb(208, 202, 213) 10%, rgb(107, 126, 145) 70%, rgb(50, 70, 90) 100%',
-        'Gold': '30deg, rgb(255, 201, 68) 30%, rgb(222, 130, 34) 100%, rgb(165, 95, 0) 100%',
-        'Platinum': '30deg, rgb(140, 197, 132) 40%, rgb(69, 178, 211) 100%, rgb(81, 167, 149) 100%',
-        'Diamond': '120deg, rgb(150, 184, 220) 10%, rgb(62, 165, 219) 60%, rgb(77, 99, 153) 100%',
-        'Ruby': '30deg, rgb(228, 91, 98) 40%, rgb(214, 28, 86) 100%, rgb(202, 0, 89) 100%'
+        'Unrated': ['#666666', '#2D2D2D', '#030202'],
+        'Bronze': ['#F49347', '#984400', '#6E3100'],
+        'Silver': ['rgb(208, 202, 213)', 'rgb(107, 126, 145)', 'rgb(50, 70, 90)'],
+        'Gold': ['rgb(255, 201, 68)', 'rgb(255, 201, 68)', 'rgb(222, 130, 34)'],
+        'Platinum': ['rgb(140, 197, 132)', 'rgb(69, 178, 211)', 'rgb(81, 167, 149)'],
+        'Diamond': ['rgb(150, 184, 220)', 'rgb(62, 165, 219)', 'rgb(77, 99, 153)'],
+        'Ruby': ['rgb(228, 91, 98)', 'rgb(214, 28, 86)', 'rgb(202, 0, 89)']
     }
 
     api_server = os.environ['API_SERVER']
     boj_handle = request.GET.get("boj", "koosaga")
 
-    user_information_url = api_server + '/user_information.php?id=' + boj_handle
+    user_information_url = api_server + '/v2/users/show.json?id=' + boj_handle
     json = requests.get(user_information_url).json()
+    json = json["result"]['user'][0]
     level = json['level']
     solved = '{0:n}'.format(json['solved'])
     boj_class = json['class']
-    exp = '{0:n}'.format(json['exp'])
     
-    tier_title, tier_rank = TIERS[level].split()    
+    next_exp = json['next_exp_cap']
+    prev_exp = json['previous_exp_cap']
+    exp_gap = next_exp - prev_exp
+    my_exp = json['exp']
+    percentage = round((my_exp - prev_exp) * 100 / exp_gap)
+    bar_size = 35 + 2.55 * percentage
+    
+    needed_exp = '{0:n}'.format(next_exp - prev_exp)
+    now_exp = '{0:n}'.format(my_exp - prev_exp)
+    exp = '{0:n}'.format(my_exp)
+    
+    if TIERS[level] == 'Unrated':
+        tier_title = TIERS[level]
+        tier_rank = 0
+    else:
+        tier_title, tier_rank = TIERS[level].split()    
     
     svg = '''
     <!DOCTYPE svg PUBLIC 
@@ -76,9 +92,9 @@ def generate_badge(request):
         <![CDATA[
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap');
-        :root {{
-            background-image: linear-gradient({background_color});
-            background-repeat: no-repeat;
+        @import url('https://fonts.googleapis.com/css2?family=Baloo+Tamma+2&display=swap');
+        .background {{
+            fill: url(#grad);
         }}
         text {{
             fill: white;
@@ -103,32 +119,57 @@ def generate_badge(request):
         .value {{
             font-weight: 400;
             font-size: 0.9em;
-            text-anchor: "end";
+            font-family: 'Baloo Tamma 2', cursive;
+        }}
+        .percentage {{
+            font-weight: 300;
+            font-size: 0.8em;
+            font-family: 'Baloo Tamma 2', cursive;
+        }}
+        .progress {{
+            font-size: 0.7em;
+            font-family: 'Baloo Tamma 2', cursive;
         }}
         ]]>
     </style>
-    <line x1="32" y1="60" x2="32" y2="115" stroke-width="2" stroke="white"/>
-    <line x1="98" y1="60" x2="98" y2="115" stroke-width="2" stroke="white"/>
-    <line x1="32" y1="115" x2="65" y2="135" stroke-width="2" stroke="white"/>
-    <line x1="98" y1="115" x2="65" y2="135" stroke-width="2" stroke="white"/>
-    <line x1="30" y1="121" x2="65" y2="141" stroke-width="2" stroke="white"/>
-    <line x1="98" y1="121" x2="65" y2="141" stroke-width="2" stroke="white"/>
-    <text x="145" y="57" class="boj-handle">{boj_handle}</text>
-    <text transform="translate(63, 46)" text-anchor="middle" alignment-baseline="middle" class="tier-text">{tier_title}</text>
-    <text x="50" y="110" class="tier-number">{tier_rank}</text>
-    <text x="145" y="90" class="subtitle">class</text><text x="250" y="90" class="class value">{boj_class}</text>
-    <text x="145" y="110" class="subtitle">solved</text><text x="250" y="110" class="solved value">{solved}</text>
-    <text x="145" y="130" class="subtitle">exp</text><text x="250" y="130" class="something value">{exp}</text>
-    <line x1="0" y1="167" x2="270" y2="167" stroke-width="6" stroke="floralwhite"/>
-    <line x1="0" y1="167" x2="350" y2="167" stroke-width="6" stroke-opacity="40%" stroke="floralwhite"/>
+    <defs>
+        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="35%">
+            <stop offset="10%" style="stop-color:{color1};stop-opacity:1" />
+            <stop offset="55%" style="stop-color:{color2};stop-opacity:1" />
+            <stop offset="100%" style="stop-color:{color3};stop-opacity:1" />
+        </linearGradient>
+    </defs>
+    <rect width="350" height="170" rx="10" ry="10" class="background"/>
+    <line x1="34" y1="50" x2="34" y2="105" stroke-width="2" stroke="white"/>
+    <line x1="100" y1="50" x2="100" y2="105" stroke-width="2" stroke="white"/>
+    <line x1="34" y1="105" x2="67" y2="125" stroke-width="2" stroke="white"/>
+    <line x1="100" y1="105" x2="67" y2="125" stroke-width="2" stroke="white"/>
+    <line x1="34" y1="110" x2="67" y2="130" stroke-width="2" stroke="white"/>
+    <line x1="100" y1="110" x2="67" y2="130" stroke-width="2" stroke="white"/>
+    <text x="145" y="50" class="boj-handle">{boj_handle}</text>
+    <text transform="translate(65, 40)" text-anchor="middle" alignment-baseline="middle" class="tier-text">{tier_title}</text>
+    <text x="52" y="100" class="tier-number">{tier_rank}</text>
+    <text x="145" y="78" class="subtitle">class</text><text x="245" y="78" class="class value">{boj_class}</text>
+    <text x="145" y="98" class="subtitle">solved</text><text x="245" y="98" class="solved value">{solved}</text>
+    <text x="145" y="118" class="subtitle">exp</text><text x="245" y="118" class="something value">{exp}</text>
+    <line x1="35" y1="142" x2="{bar_size}" y2="142" stroke-width="4" stroke="floralwhite" stroke-linecap="round"/>
+    <line x1="35" y1="142" x2="290" y2="142" stroke-width="4" stroke-opacity="40%" stroke="floralwhite" stroke-linecap="round"/>
+    <text x="297" y="142" alignment-baseline="middle" class="percentage">{percentage}%</text>
+    <text x="293" y="157" class="progress" text-anchor="end">{now_exp} / {needed_exp}</text>
 </svg>
-    '''.format(background_color=BACKGROUND_COLOR[tier_title],
+    '''.format(color1=BACKGROUND_COLOR[tier_title][0],
+               color2=BACKGROUND_COLOR[tier_title][1],
+               color3=BACKGROUND_COLOR[tier_title][2],
                boj_handle=boj_handle,
                tier_rank=tier_rank,
                tier_title=tier_title,
                solved=solved,
                boj_class=boj_class,
-               exp=exp)
+               exp=exp,
+               now_exp=now_exp,
+               needed_exp=needed_exp,
+               percentage=percentage,
+               bar_size=bar_size)
 
     response = HttpResponse(content=svg)
     response['Content-Type'] = 'image/svg+xml'
