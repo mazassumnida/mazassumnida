@@ -158,9 +158,7 @@ def generate_badge(request):
                now_exp=now_exp,
                needed_exp=needed_exp,
                percentage=percentage,
-               bar_size=bar_size,
-               font1=FONT1,
-               font2=FONT2)
+               bar_size=bar_size)
 
     response = HttpResponse(content=svg)
     response['Content-Type'] = 'image/svg+xml'
