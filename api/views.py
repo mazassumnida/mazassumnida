@@ -90,10 +90,10 @@ def generate_badge(request):
     xml:space="preserve">
     <style type="text/css">
         <![CDATA[
-            @font-face {
+            @font-face {{
                 font-family: "Caveat";
                 src: url("data:application/font-woff;charset=utf-8;base64,...");
-            }
+            }}
             @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=block');
             @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=block');
             @import url('https://fonts.googleapis.com/css2?family=Baloo+Tamma+2&display=block');
