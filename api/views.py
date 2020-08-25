@@ -90,46 +90,50 @@ def generate_badge(request):
     xml:space="preserve">
     <style type="text/css">
         <![CDATA[
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=block');
-        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=block');
-        @import url('https://fonts.googleapis.com/css2?family=Baloo+Tamma+2&display=block');
-        .background {{
-            fill: url(#grad);
-        }}
-        text {{
-            fill: white;
-            font-family: 'Noto Sans KR', sans-serif;
-        }}
-        text.boj-handle {{
-            font-weight: 700;
-            font-size: 1.45em;
-        }}
-        text.tier-text {{
-            font-family: 'Caveat', cursive;
-            font-size: 2em;
-        }}
-        text.tier-number {{
-            font-size: 3.1em;
-            font-weight: 700;
-        }}
-        .subtitle {{
-            font-weight: 400;
-            font-size: 0.9em;
-        }}
-        .value {{
-            font-weight: 400;
-            font-size: 0.9em;
-            font-family: 'Baloo Tamma 2', cursive;
-        }}
-        .percentage {{
-            font-weight: 300;
-            font-size: 0.8em;
-            font-family: 'Baloo Tamma 2', cursive;
-        }}
-        .progress {{
-            font-size: 0.7em;
-            font-family: 'Baloo Tamma 2', cursive;
-        }}
+            @font-face {
+                font-family: "Caveat";
+                src: url("data:application/font-woff;charset=utf-8;base64,...");
+            }
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=block');
+            @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=block');
+            @import url('https://fonts.googleapis.com/css2?family=Baloo+Tamma+2&display=block');
+            .background {{
+                fill: url(#grad);
+            }}
+            text {{
+                fill: white;
+                font-family: 'Noto Sans KR', sans-serif;
+            }}
+            text.boj-handle {{
+                font-weight: 700;
+                font-size: 1.45em;
+            }}
+            text.tier-text {{
+                font-family: 'Caveat', cursive;
+                font-size: 2em;
+            }}
+            text.tier-number {{
+                font-size: 3.1em;
+                font-weight: 700;
+            }}
+            .subtitle {{
+                font-weight: 400;
+                font-size: 0.9em;
+            }}
+            .value {{
+                font-weight: 400;
+                font-size: 0.9em;
+                font-family: 'Baloo Tamma 2', cursive;
+            }}
+            .percentage {{
+                font-weight: 300;
+                font-size: 0.8em;
+                font-family: 'Baloo Tamma 2', cursive;
+            }}
+            .progress {{
+                font-size: 0.7em;
+                font-family: 'Baloo Tamma 2', cursive;
+            }}
         ]]>
     </style>
     <defs>
