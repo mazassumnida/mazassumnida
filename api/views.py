@@ -3,6 +3,7 @@ import requests
 import locale
 
 from django.http import HttpResponse
+from .fonts import FONT1, FONT2
 
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
@@ -91,12 +92,17 @@ def generate_badge(request):
     <style type="text/css">
         <![CDATA[
             @font-face {{
-                font-family: "Caveat";
-                src: url("data:application/font-woff;charset=utf-8;base64,...");
+                font-family: 'Noto Sans KR';
+                font-style: normal;
+                font-weight: 400;
+                src: url(data:font/woff2;base64, {font1});
             }}
-            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=block');
-            @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=block');
-            @import url('https://fonts.googleapis.com/css2?family=Baloo+Tamma+2&display=block');
+            @font-face {{
+                font-family: 'Caveat';
+                font-style: normal;
+                font-weight: 400;
+                src: url(data:font/woff2;base64, {font2});
+            }}
             .background {{
                 fill: url(#grad);
             }}
@@ -173,7 +179,9 @@ def generate_badge(request):
                now_exp=now_exp,
                needed_exp=needed_exp,
                percentage=percentage,
-               bar_size=bar_size)
+               bar_size=bar_size,
+               font1=FONT1,
+               font2=FONT2)
 
     response = HttpResponse(content=svg)
     response['Content-Type'] = 'image/svg+xml'
