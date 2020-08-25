@@ -75,7 +75,7 @@ def generate_badge(request):
     
     if TIERS[level] == 'Unrated':
         tier_title = TIERS[level]
-        tier_rank = 0
+        tier_rank = ''
     else:
         tier_title, tier_rank = TIERS[level].split()    
     
@@ -105,7 +105,7 @@ def generate_badge(request):
             text.tier-text {{
                 font-weight: 700;
                 font-size: 1.45em;
-                opacity: 65%;
+                opacity: 55%;
             }}
             text.tier-number {{
                 font-size: 3.1em;
