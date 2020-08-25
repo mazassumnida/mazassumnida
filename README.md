@@ -25,7 +25,7 @@ python manage.py runserver # 서버 실행
 ### Diamond 💎
 <a href="https://imgbb.com/"><img src="https://i.ibb.co/0cjvjGn/2020-08-26-2-03-10.png" alt="2020-08-26-2-03-10" border="0"></a>
 ### Platinum 💚
-<a href="https://imgbb.com/"><img src="https://i.ibb.co/JyQ9D1d/2020-08-26-2-02-26.png" alt="2020-08-26-2-02-26" border="0"></a>
+<a href="https://imgbb.com/"><img src="https://i.ibb.co/4VnmL99/2020-08-26-2-10-40.png" alt="2020-08-26-2-10-40" border="0"></a>
 ### Gold 🏅
 <a href="https://imgbb.com/"><img src="https://i.ibb.co/88n5MR4/2020-08-26-2-03-56.png" alt="2020-08-26-2-03-56" border="0"></a>
 ### Silver 💍
