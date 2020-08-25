@@ -3,7 +3,6 @@ import requests
 import locale
 
 from django.http import HttpResponse
-from .fonts import FONT1, FONT2
 
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
@@ -42,7 +41,7 @@ def generate_badge(request):
         "Ruby 2",
         "Ruby 1",
     )
-
+    
     BACKGROUND_COLOR = {
         'Unrated': ['#666666', '#2D2D2D', '#030202'],
         'Bronze': ['#F49347', '#984400', '#6E3100'],
@@ -62,48 +61,38 @@ def generate_badge(request):
     level = json['level']
     solved = '{0:n}'.format(json['solved'])
     boj_class = json['class']
-
+    
     next_exp = json['next_exp_cap']
     prev_exp = json['previous_exp_cap']
     exp_gap = next_exp - prev_exp
     my_exp = json['exp']
     percentage = round((my_exp - prev_exp) * 100 / exp_gap)
     bar_size = 35 + 2.55 * percentage
-
+    
     needed_exp = '{0:n}'.format(next_exp - prev_exp)
     now_exp = '{0:n}'.format(my_exp - prev_exp)
     exp = '{0:n}'.format(my_exp)
-
+    
     if TIERS[level] == 'Unrated':
         tier_title = TIERS[level]
         tier_rank = 0
     else:
-        tier_title, tier_rank = TIERS[level].split()
-
+        tier_title, tier_rank = TIERS[level].split()    
+    
     svg = '''
-    <!DOCTYPE svg PUBLIC
-        "-//W3C//DTD SVG 1.1//EN"
+    <!DOCTYPE svg PUBLIC 
+        "-//W3C//DTD SVG 1.1//EN" 
         "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg height="170" width="350"
-    version="1.1"
-    xmlns="http://www.w3.org/2000/svg"
-    xmlns:xlink="http://www.w3.org/1999/xlink"
+<svg height="170" width="350"   
+    version="1.1" 
+    xmlns="http://www.w3.org/2000/svg" 
+    xmlns:xlink="http://www.w3.org/1999/xlink" 
     xml:space="preserve">
-    <defs>
     <style type="text/css">
         <![CDATA[
-            @font-face {{
-                font-family: 'Noto Sans KR';
-                font-style: normal;
-                font-weight: 400;
-                src: url(data:font/woff2;base64, {font1});
-            }}
-            @font-face {{
-                font-family: 'Caveat';
-                font-style: normal;
-                font-weight: 400;
-                src: url(data:font/woff2;base64, {font2});
-            }}
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=block');
+            @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=block');
+            @import url('https://fonts.googleapis.com/css2?family=Baloo+Tamma+2&display=block');
             .background {{
                 fill: url(#grad);
             }}
@@ -143,6 +132,7 @@ def generate_badge(request):
             }}
         ]]>
     </style>
+    <defs>
         <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="35%">
             <stop offset="10%" style="stop-color:{color1};stop-opacity:1" />
             <stop offset="55%" style="stop-color:{color2};stop-opacity:1" />
