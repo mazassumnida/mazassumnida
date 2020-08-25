@@ -36,5 +36,5 @@ python manage.py runserver # 서버 실행
 ## Usage
 
 ```html
-[![http://mazassumnida.wtf/api/generate_badge?boj={handle}](http://mazassumnida.wtf/api/generate_badge?boj={handle})](https://solved.ac/{handle})
+[![Solved.ac 프로필](http://mazassumnida.wtf/api/generate_badge?boj={handle})](https://solved.ac/{handle})
 ```
