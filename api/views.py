@@ -179,16 +179,16 @@ def generate_badge(request):
     <rect width="350" height="170" rx="10" ry="10" class="background"/>
     <text x="315" y="50" class="tier-text" text-anchor="end" >{tier_title}{tier_rank}</text>
     <text x="35" y="50" class="boj-handle">{boj_handle}</text>
-    <g id="this_month_commits" class="item" style="animation-delay: 200ms">
+    <g class="item" style="animation-delay: 200ms">
         <text x="35" y="79" class="subtitle">class</text><text x="145" y="79" class="class value">{boj_class}</text>
     </g>
-    <g id="this_month_commits" class="item" style="animation-delay: 400ms">
+    <g class="item" style="animation-delay: 400ms">
         <text x="35" y="99" class="subtitle">solved</text><text x="145" y="99" class="solved value">{solved}</text>
     </g>
-    <g id="this_month_commits" class="item" style="animation-delay: 600ms">
+    <g class="item" style="animation-delay: 600ms">
         <text x="35" y="119" class="subtitle">exp</text><text x="145" y="119" class="something value">{exp}</text>
     </g>
-    <g id="this_month_commits" class="exp-bar" style="animation-delay: 800ms">
+    <g class="exp-bar" style="animation-delay: 800ms">
         <line x1="35" y1="142" x2="{bar_size}" y2="142" stroke-width="4" stroke="floralwhite" stroke-linecap="round"/>
     </g>
     <line x1="35" y1="142" x2="290" y2="142" stroke-width="4" stroke-opacity="40%" stroke="floralwhite" stroke-linecap="round"/>
