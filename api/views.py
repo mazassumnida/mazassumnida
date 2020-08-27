@@ -3,6 +3,7 @@ import requests
 import locale
 
 from django.http import HttpResponse
+from .images import UNKNOWN, UNRATED, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND, RUBY
 
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
@@ -53,14 +54,14 @@ BACKGROUND_COLOR = {
 }
 
 TIER_IMG_LINK = {
-    'Unknown': 'https://i.ibb.co/Fs2nD0L/Unknown.png',
-    'Unrated': 'https://i.ibb.co/wsjTsCF/Unrated.png',
-    'Bronze': 'https://i.ibb.co/pnF65sw/Bronze.png',
-    'Silver': 'https://i.ibb.co/Q6Rnj1P/Silver.png',
-    'Gold': 'https://i.ibb.co/HqWGzzr/Gold.png',
-    'Platinum': 'https://i.ibb.co/Cm1Zp1h/Platinum.png',
-    'Diamond': 'https://i.ibb.co/DWjTx2p/Diamond.png',
-    'Ruby': 'https://i.ibb.co/n6Mcyk5/Ruby.png'
+    'Unknown': UNKNOWN,
+    'Unrated': UNRATED,
+    'Bronze': BRONZE,
+    'Silver': SILVER,
+    'Gold': GOLD,
+    'Platinum': PLATINUM,
+    'Diamond': DIAMOND,
+    'Ruby': RUBY
 }
 
 
