@@ -52,6 +52,17 @@ BACKGROUND_COLOR = {
     'Ruby': ['rgb(228, 91, 98)', 'rgb(214, 28, 86)', 'rgb(202, 0, 89)']
 }
 
+TIER_IMG_LINK = {
+        'Unknown': 'https://i.ibb.co/Fs2nD0L/Unknown.png',
+        'Unrated': 'https://i.ibb.co/wsjTsCF/Unrated.png',
+        'Bronze': 'https://i.ibb.co/pnF65sw/Bronze.png',
+        'Silver': 'https://i.ibb.co/Q6Rnj1P/Silver.png',
+        'Gold': 'https://i.ibb.co/HqWGzzr/Gold.png',
+        'Platinum': 'https://i.ibb.co/Cm1Zp1h/Platinum.png',
+        'Diamond': 'https://i.ibb.co/DWjTx2p/Diamond.png',
+        'Ruby': 'https://i.ibb.co/n6Mcyk5/Ruby.png'
+    }
+
 
 class Settings_url(object):
     def __init__(self, request):
@@ -102,9 +113,7 @@ class Boj_default_settings_try(object):
 
 
 def generate_badge(request):
-
     url_set = Settings_url(request)
-
     handle_set = Boj_default_settings_try(request, url_set)
 
     svg = '''
@@ -228,11 +237,9 @@ def generate_badge(request):
 
 
 def generate_badge_v2(request):
-
     url_set = Settings_url(request)
-
     handle_set = Boj_default_settings_try(request, url_set)
-
+    
     svg = '''
     <!DOCTYPE svg PUBLIC 
         "-//W3C//DTD SVG 1.1//EN" 
@@ -270,7 +277,7 @@ def generate_badge_v2(request):
             }}
             text.boj-handle {{
                 font-weight: 700;
-                font-size: 1.45em;
+                font-size: 1.30em;
             }}
             text.tier-text {{
                 font-weight: 700;
@@ -315,16 +322,23 @@ def generate_badge_v2(request):
         </linearGradient>
     </defs>
     <rect width="350" height="170" rx="10" ry="10" class="background"/>
-    <text x="315" y="50" class="tier-text" text-anchor="end" >{tier_title}{tier_rank}</text>
-    <text x="35" y="50" class="boj-handle">{boj_handle}</text>
+    <line x1="34" y1="50" x2="34" y2="105" stroke-width="2" stroke="white"/>
+    <line x1="100" y1="50" x2="100" y2="105" stroke-width="2" stroke="white"/>
+    <line x1="34" y1="105" x2="67" y2="125" stroke-width="2" stroke="white"/>
+    <line x1="100" y1="105" x2="67" y2="125" stroke-width="2" stroke="white"/>
+    <line x1="34" y1="110" x2="67" y2="130" stroke-width="2" stroke="white"/>
+    <line x1="100" y1="110" x2="67" y2="130" stroke-width="2" stroke="white"/>
+    <text x="135" y="50" class="boj-handle">{boj_handle}</text>
+    <image href="{tier_img_link}" x="18" y="12" height="50px" width="100px"/>
+    <text x="52" y="100" class="tier-number">{tier_rank}</text>
     <g class="item" style="animation-delay: 200ms">
-        <text x="35" y="79" class="subtitle">class</text><text x="145" y="79" class="class value">{boj_class}</text>
+        <text x="135" y="79" class="subtitle">class</text><text x="225" y="79" class="class value">{boj_class}</text>
     </g>
     <g class="item" style="animation-delay: 400ms">
-        <text x="35" y="99" class="subtitle">solved</text><text x="145" y="99" class="solved value">{solved}</text>
+        <text x="135" y="99" class="subtitle">solved</text><text x="225" y="99" class="solved value">{solved}</text>
     </g>
     <g class="item" style="animation-delay: 600ms">
-        <text x="35" y="119" class="subtitle">exp</text><text x="145" y="119" class="something value">{exp}</text>
+        <text x="135" y="119" class="subtitle">exp</text><text x="225" y="119" class="something value">{exp}</text>
     </g>
     <g class="exp-bar" style="animation-delay: 800ms">
         <line x1="35" y1="142" x2="{bar_size}" y2="142" stroke-width="4" stroke="floralwhite" stroke-linecap="round"/>
@@ -338,7 +352,7 @@ def generate_badge_v2(request):
                color3=BACKGROUND_COLOR[handle_set.tier_title][2],
                boj_handle=url_set.boj_handle,
                tier_rank=handle_set.tier_rank,
-               tier_title=handle_set.tier_title,
+               tier_img_link=TIER_IMG_LINK[handle_set.tier_title],
                solved=handle_set.solved,
                boj_class=handle_set.boj_class,
                exp=handle_set.exp,
