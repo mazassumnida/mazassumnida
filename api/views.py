@@ -53,22 +53,26 @@ BACKGROUND_COLOR = {
 }
 
 TIER_IMG_LINK = {
-        'Unknown': 'https://i.ibb.co/Fs2nD0L/Unknown.png',
-        'Unrated': 'https://i.ibb.co/wsjTsCF/Unrated.png',
-        'Bronze': 'https://i.ibb.co/pnF65sw/Bronze.png',
-        'Silver': 'https://i.ibb.co/Q6Rnj1P/Silver.png',
-        'Gold': 'https://i.ibb.co/HqWGzzr/Gold.png',
-        'Platinum': 'https://i.ibb.co/Cm1Zp1h/Platinum.png',
-        'Diamond': 'https://i.ibb.co/DWjTx2p/Diamond.png',
-        'Ruby': 'https://i.ibb.co/n6Mcyk5/Ruby.png'
-    }
+    'Unknown': 'https://i.ibb.co/Fs2nD0L/Unknown.png',
+    'Unrated': 'https://i.ibb.co/wsjTsCF/Unrated.png',
+    'Bronze': 'https://i.ibb.co/pnF65sw/Bronze.png',
+    'Silver': 'https://i.ibb.co/Q6Rnj1P/Silver.png',
+    'Gold': 'https://i.ibb.co/HqWGzzr/Gold.png',
+    'Platinum': 'https://i.ibb.co/Cm1Zp1h/Platinum.png',
+    'Diamond': 'https://i.ibb.co/DWjTx2p/Diamond.png',
+    'Ruby': 'https://i.ibb.co/n6Mcyk5/Ruby.png'
+}
 
 
 class Settings_url(object):
-    def __init__(self, request):
+    def __init__(self, request, MAX_LEN):
         self.api_server = os.environ['API_SERVER']
         self.boj_handle = request.GET.get("boj", "ccoco")
-
+        if len(self.boj_handle) > MAX_LEN:
+            self.boj_name = self.boj_handle[:(MAX_LEN - 2)] + "..."
+            print("boj handle edit")
+        else:
+            self.boj_name = self.boj_handle
         self.user_information_url = self.api_server + \
             '/v2/users/show.json?id=' + self.boj_handle
 
@@ -113,8 +117,9 @@ class Boj_default_settings_try(object):
 
 
 def generate_badge(request):
-    url_set = Settings_url(request)
-    handle_set = Boj_default_settings_try(request, url_set)
+    MAX_LEN = 11
+    url_set = Settings_url(request, MAX_LEN)
+    handle_set = Boj_default_settings_try(request, url_set, )
 
     svg = '''
     <!DOCTYPE svg PUBLIC 
@@ -219,7 +224,7 @@ def generate_badge(request):
     '''.format(color1=BACKGROUND_COLOR[handle_set.tier_title][0],
                color2=BACKGROUND_COLOR[handle_set.tier_title][1],
                color3=BACKGROUND_COLOR[handle_set.tier_title][2],
-               boj_handle=url_set.boj_handle,
+               boj_handle=url_set.boj_name,
                tier_rank=handle_set.tier_rank,
                tier_title=handle_set.tier_title,
                solved=handle_set.solved,
@@ -237,9 +242,10 @@ def generate_badge(request):
 
 
 def generate_badge_v2(request):
-    url_set = Settings_url(request)
+    MAX_LEN = 15
+    url_set = Settings_url(request, MAX_LEN)
     handle_set = Boj_default_settings_try(request, url_set)
-    
+
     svg = '''
     <!DOCTYPE svg PUBLIC 
         "-//W3C//DTD SVG 1.1//EN" 
@@ -350,7 +356,7 @@ def generate_badge_v2(request):
     '''.format(color1=BACKGROUND_COLOR[handle_set.tier_title][0],
                color2=BACKGROUND_COLOR[handle_set.tier_title][1],
                color3=BACKGROUND_COLOR[handle_set.tier_title][2],
-               boj_handle=url_set.boj_handle,
+               boj_handle=url_set.boj_name,
                tier_rank=handle_set.tier_rank,
                tier_img_link=TIER_IMG_LINK[handle_set.tier_title],
                solved=handle_set.solved,
