@@ -65,7 +65,7 @@ python manage.py runserver # 서버 실행
 <img src="https://i.ibb.co/C6gc9jD/chrome-h1796lob-Nu.png" alt="chrome-h1796lob-Nu" border="0">
 
 #### Diamond 💎
-<img src="https://i.ibb.co/3svv5ZK/chrome-s-Xr44t-S85-B.png" alt="chrome-s-Xr44t-S85-B" border="0">
+<img src="https://i.ibb.co/W0DTqfF/chrome-0s-RCb-MPg-Ia.png" alt="chrome-s-Xr44t-S85-B" border="0">
 
 #### Platinum 💚
 <img src="https://i.ibb.co/HpHCVXG/chrome-0-LDwg6-Mgw-Y.png" alt="chrome-0-LDwg6-Mgw-Y" border="0">
