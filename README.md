@@ -22,7 +22,6 @@ python manage.py runserver # 서버 실행
 ## Screenshots_v1
 
 ### Ruby 🍒
-
 <img src="https://i.ibb.co/LZGnH5R/2020-08-26-2-02-58.png" alt="2020-08-26-2-02-58" border="0">
 ### Diamond 💎
 <img src="https://i.ibb.co/0cjvjGn/2020-08-26-2-03-10.png" alt="2020-08-26-2-03-10" border="0">
@@ -45,7 +44,6 @@ python manage.py runserver # 서버 실행
 ## Screenshots_v2
 
 ### Ruby 🍒
-
 <img src="https://i.ibb.co/C6gc9jD/chrome-h1796lob-Nu.png" alt="chrome-h1796lob-Nu" border="0">
 ### Diamond 💎
 <img src="https://i.ibb.co/3svv5ZK/chrome-s-Xr44t-S85-B.png" alt="chrome-s-Xr44t-S85-B" border="0">
