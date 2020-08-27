@@ -19,22 +19,48 @@ pip install -r requirements.txt
 python manage.py runserver # 서버 실행
 ```
 
-## Screenshots
+## Screenshots_v1
+
 ### Ruby 🍒
-<a href="https://imgbb.com/"><img src="https://i.ibb.co/LZGnH5R/2020-08-26-2-02-58.png" alt="2020-08-26-2-02-58" border="0"></a>
+
+<img src="https://i.ibb.co/LZGnH5R/2020-08-26-2-02-58.png" alt="2020-08-26-2-02-58" border="0">
 ### Diamond 💎
-<a href="https://imgbb.com/"><img src="https://i.ibb.co/0cjvjGn/2020-08-26-2-03-10.png" alt="2020-08-26-2-03-10" border="0"></a>
+<img src="https://i.ibb.co/0cjvjGn/2020-08-26-2-03-10.png" alt="2020-08-26-2-03-10" border="0">
 ### Platinum 💚
-<a href="https://imgbb.com/"><img src="https://i.ibb.co/4VnmL99/2020-08-26-2-10-40.png" alt="2020-08-26-2-10-40" border="0"></a>
+<img src="https://i.ibb.co/4VnmL99/2020-08-26-2-10-40.png" alt="2020-08-26-2-10-40" border="0">
 ### Gold 🏅
-<a href="https://imgbb.com/"><img src="https://i.ibb.co/88n5MR4/2020-08-26-2-03-56.png" alt="2020-08-26-2-03-56" border="0"></a>
+<img src="https://i.ibb.co/88n5MR4/2020-08-26-2-03-56.png" alt="2020-08-26-2-03-56" border="0">
 ### Silver 💍
-<a href="https://imgbb.com/"><img src="https://i.ibb.co/mXhLMHJ/2020-08-26-2-03-30.png" alt="2020-08-26-2-03-30" border="0"></a>
+<img src="https://i.ibb.co/mXhLMHJ/2020-08-26-2-03-30.png" alt="2020-08-26-2-03-30" border="0">
 ### Bronze 🍂
-<a href="https://imgbb.com/"><img src="https://i.ibb.co/4tpFkR5/2020-08-26-2-03-40.png" alt="2020-08-26-2-03-40" border="0"></a>
+<img src="https://i.ibb.co/4tpFkR5/2020-08-26-2-03-40.png" alt="2020-08-26-2-03-40" border="0">
 
 ## Usage
 
 ```html
-[![Solved.ac 프로필](http://mazassumnida.wtf/api/generate_badge?boj={handle})](https://solved.ac/{handle})
+[![Solved.ac
+프로필](http://mazassumnida.wtf/api/generate_badge?boj={handle})](https://solved.ac/{handle})
+```
+
+## Screenshots_v2
+
+### Ruby 🍒
+
+<img src="https://i.ibb.co/C6gc9jD/chrome-h1796lob-Nu.png" alt="chrome-h1796lob-Nu" border="0">
+### Diamond 💎
+<img src="https://i.ibb.co/3svv5ZK/chrome-s-Xr44t-S85-B.png" alt="chrome-s-Xr44t-S85-B" border="0">
+### Platinum 💚
+<img src="https://i.ibb.co/HpHCVXG/chrome-0-LDwg6-Mgw-Y.png" alt="chrome-0-LDwg6-Mgw-Y" border="0">
+### Gold 🏅
+<img src="https://i.ibb.co/WfkLNRQ/chrome-y-AXSQ9j-Z9t.png" alt="chrome-y-AXSQ9j-Z9t" border="0">
+### Silver 💍
+<img src="https://i.ibb.co/41KnjDm/chrome-PZp-C0lw-NXK.png" alt="chrome-PZp-C0lw-NXK" border="0">
+### Bronze 🍂
+<img src="https://i.ibb.co/Vg2NcZH/chrome-VBCSLd8v-HF.png" alt="chrome-VBCSLd8v-HF" border="0">
+
+## Usage
+
+```html
+[![Solved.ac
+프로필](http://mazassumnida.wtf/api/v2/generate_badge?boj={handle})](https://solved.ac/{handle})
 ```
