@@ -10,36 +10,12 @@ locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 # Create your views here.
 TIERS = (
     "Unrated",
-    "Bronze 5",
-    "Bronze 4",
-    "Bronze 3",
-    "Bronze 2",
-    "Bronze 1",
-    "Silver 5",
-    "Silver 4",
-    "Silver 3",
-    "Silver 2",
-    "Silver 1",
-    "Gold 5",
-    "Gold 4",
-    "Gold 3",
-    "Gold 2",
-    "Gold 1",
-    "Platinum 5",
-    "Platinum 4",
-    "Platinum 3",
-    "Platinum 2",
-    "Platinum 1",
-    "Diamond 5",
-    "Diamond 4",
-    "Diamond 3",
-    "Diamond 2",
-    "Diamond 1",
-    "Ruby 5",
-    "Ruby 4",
-    "Ruby 3",
-    "Ruby 2",
-    "Ruby 1",
+    "Bronze 5", "Bronze 4", "Bronze 3", "Bronze 2", "Bronze 1",
+    "Silver 5", "Silver 4", "Silver 3", "Silver 2", "Silver 1",
+    "Gold 5", "Gold 4", "Gold 3", "Gold 2", "Gold 1",
+    "Platinum 5", "Platinum 4", "Platinum 3", "Platinum 2", "Platinum 1",
+    "Diamond 5", "Diamond 4", "Diamond 3", "Diamond 2", "Diamond 1",
+    "Ruby 5", "Ruby 4", "Ruby 3", "Ruby 2", "Ruby 1",
 )
 
 BACKGROUND_COLOR = {
@@ -65,7 +41,7 @@ TIER_IMG_LINK = {
 }
 
 
-class Settings_url(object):
+class UrlSettings(object):
     def __init__(self, request, MAX_LEN):
         self.api_server = os.environ['API_SERVER']
         self.boj_handle = request.GET.get("boj", "ccoco")
@@ -78,7 +54,7 @@ class Settings_url(object):
             '/v2/users/show.json?id=' + self.boj_handle
 
 
-class Boj_default_settings_try(object):
+class BojDefaultSettings(object):
     def __init__(self, request, url_set):
         try:
             self.json = requests.get(url_set.user_information_url).json()
@@ -119,8 +95,8 @@ class Boj_default_settings_try(object):
 
 def generate_badge(request):
     MAX_LEN = 11
-    url_set = Settings_url(request, MAX_LEN)
-    handle_set = Boj_default_settings_try(request, url_set, )
+    url_set = UrlSettings(request, MAX_LEN)
+    handle_set = BojDefaultSettings(request, url_set)
 
     svg = '''
     <!DOCTYPE svg PUBLIC 
@@ -244,8 +220,8 @@ def generate_badge(request):
 
 def generate_badge_v2(request):
     MAX_LEN = 15
-    url_set = Settings_url(request, MAX_LEN)
-    handle_set = Boj_default_settings_try(request, url_set)
+    url_set = UrlSettings(request, MAX_LEN)
+    handle_set = BojDefaultSettings(request, url_set)
 
     svg = '''
     <!DOCTYPE svg PUBLIC 
