@@ -12,7 +12,7 @@ Github 프로필에서 boj 프로필을 이쁘게 보여주는 프로젝트
 프로필](http://mazassumnida.wtf/api/generate_badge?boj=ccoco)](https://solved.ac/ccoco)
 
 [![Solved.ac
-프로필](http://mazassumnida.wtf/api/v2/generate_badge?boj=strawji)](https://solved.ac/strawji)
+프로필](http://mazassumnida.wtf/api/v2/generate_badge?boj=strawJI)](https://solved.ac/strawji)
 
 ## install
 
