@@ -23,7 +23,7 @@ python manage.py runserver # 서버 실행
 
 ### Usage
 
-만약 로드된 후 애니메이션을 다시 보고싶으시면 ' ctrl + shift + R ' 을 눌러서 강력 새로고침을 하시면 다시 보실수 있습니다!
+만약 로드된 후 애니메이션을 다시 보고싶으시면 'ctrl + shift + R' 을 눌러서 강력 새로고침을 하시면 다시 보실수 있습니다!
 
 ```html
 [![Solved.ac
