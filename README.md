@@ -14,6 +14,10 @@ Github 프로필에서 boj 프로필을 이쁘게 보여주는 프로젝트
 [![Solved.ac
 프로필](http://mazassumnida.wtf/api/v2/generate_badge?boj=strawJI)](https://solved.ac/strawji)
 
+
+만약 로드된 후 애니메이션을 다시 보고싶으시면 `ctrl + shift + R` 을 눌러서 강력 새로고침을 하시면 다시 보실 수 있습니다!
+
+
 ## install
 
 ### Poetry를 이용할 경우
@@ -34,8 +38,6 @@ python manage.py runserver # 서버 실행
 ## Mazassumnida v.1.0
 
 ### Usage
-
-만약 로드된 후 애니메이션을 다시 보고싶으시면 `ctrl + shift + R` 을 눌러서 강력 새로고침을 하시면 다시 보실 수 있습니다!
 
 ```html
 [![Solved.ac
