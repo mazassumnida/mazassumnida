@@ -10,36 +10,12 @@ locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 # Create your views here.
 TIERS = (
     "Unrated",
-    "Bronze 5",
-    "Bronze 4",
-    "Bronze 3",
-    "Bronze 2",
-    "Bronze 1",
-    "Silver 5",
-    "Silver 4",
-    "Silver 3",
-    "Silver 2",
-    "Silver 1",
-    "Gold 5",
-    "Gold 4",
-    "Gold 3",
-    "Gold 2",
-    "Gold 1",
-    "Platinum 5",
-    "Platinum 4",
-    "Platinum 3",
-    "Platinum 2",
-    "Platinum 1",
-    "Diamond 5",
-    "Diamond 4",
-    "Diamond 3",
-    "Diamond 2",
-    "Diamond 1",
-    "Ruby 5",
-    "Ruby 4",
-    "Ruby 3",
-    "Ruby 2",
-    "Ruby 1",
+    "Bronze 5", "Bronze 4", "Bronze 3", "Bronze 2", "Bronze 1",
+    "Silver 5", "Silver 4", "Silver 3", "Silver 2", "Silver 1",
+    "Gold 5", "Gold 4", "Gold 3", "Gold 2", "Gold 1",
+    "Platinum 5", "Platinum 4", "Platinum 3", "Platinum 2", "Platinum 1",
+    "Diamond 5", "Diamond 4", "Diamond 3", "Diamond 2", "Diamond 1",
+    "Ruby 5", "Ruby 4", "Ruby 3", "Ruby 2", "Ruby 1",
 )
 
 BACKGROUND_COLOR = {
@@ -65,20 +41,19 @@ TIER_IMG_LINK = {
 }
 
 
-class Settings_url(object):
+class UrlSettings(object):
     def __init__(self, request, MAX_LEN):
         self.api_server = os.environ['API_SERVER']
         self.boj_handle = request.GET.get("boj", "ccoco")
         if len(self.boj_handle) > MAX_LEN:
             self.boj_name = self.boj_handle[:(MAX_LEN - 2)] + "..."
-            print("boj handle edit")
         else:
             self.boj_name = self.boj_handle
         self.user_information_url = self.api_server + \
             '/v2/users/show.json?id=' + self.boj_handle
 
 
-class Boj_default_settings_try(object):
+class BojDefaultSettings(object):
     def __init__(self, request, url_set):
         try:
             self.json = requests.get(url_set.user_information_url).json()
@@ -119,8 +94,8 @@ class Boj_default_settings_try(object):
 
 def generate_badge(request):
     MAX_LEN = 11
-    url_set = Settings_url(request, MAX_LEN)
-    handle_set = Boj_default_settings_try(request, url_set, )
+    url_set = UrlSettings(request, MAX_LEN)
+    handle_set = BojDefaultSettings(request, url_set)
 
     svg = '''
     <!DOCTYPE svg PUBLIC 
@@ -259,8 +234,8 @@ def generate_badge(request):
 
 def generate_badge_v2(request):
     MAX_LEN = 15
-    url_set = Settings_url(request, MAX_LEN)
-    handle_set = Boj_default_settings_try(request, url_set)
+    url_set = UrlSettings(request, MAX_LEN)
+    handle_set = BojDefaultSettings(request, url_set)
 
     svg = '''
     <!DOCTYPE svg PUBLIC 
@@ -440,6 +415,92 @@ def generate_badge_v2(request):
                boj_handle=url_set.boj_name,
                tier_rank=handle_set.tier_rank,
                tier_img_link=TIER_IMG_LINK[handle_set.tier_title],
+               solved=handle_set.solved,
+               boj_class=handle_set.boj_class,
+               exp=handle_set.exp,
+               now_exp=handle_set.now_exp,
+               needed_exp=handle_set.needed_exp,
+               percentage=handle_set.percentage,
+               bar_size=handle_set.bar_size)
+
+    response = HttpResponse(content=svg)
+    response['Content-Type'] = 'image/svg+xml'
+
+    return response
+
+def generate_badge_mini(request):
+    MAX_LEN = 11
+    url_set = UrlSettings(request, MAX_LEN)
+    handle_set = BojDefaultSettings(request, url_set)
+
+    svg = '''
+    <!DOCTYPE svg PUBLIC 
+        "-//W3C//DTD SVG 1.1//EN" 
+        "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg height="20" width="110"   
+    version="1.1" 
+    xmlns="http://www.w3.org/2000/svg" 
+    xmlns:xlink="http://www.w3.org/1999/xlink" 
+    xml:space="preserve">
+    <style type="text/css">
+        <![CDATA[
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=block');
+            @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
+            @keyframes fadeIn {{
+                from {{
+                    opacity: 0;
+                }}
+                to {{
+                    opacity: 1;
+                }}
+            }}
+            @keyframes expBarAnimation {{
+                from {{
+                    stroke-dashoffset: {bar_size};
+                }}
+                to {{
+                    stroke-dashoffset: 35;
+                }}
+            }}
+            .background {{
+                fill: url(#grad1);
+            }}
+            text {{
+                fill: white;
+                font-family: 'Nunito', sans-serif;
+                font-size: 0.8em;
+            }}
+            .gray-area {{
+                fill: #555555;
+            }}
+            .tier {{
+                font-weight: 700;
+            }}
+        ]]>
+    </style>
+    <defs>
+        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="35%">
+            <stop offset="10%" style="stop-color:{color1};stop-opacity:1" />
+            <stop offset="55%" style="stop-color:{color2};stop-opacity:1" />
+            <stop offset="100%" style="stop-color:{color3};stop-opacity:1" />
+        </linearGradient>
+        <clipPath id="round-corner">
+            <rect x="0" y="0" width="110" height="20" rx="3" ry="3"/>
+        </clipPath>
+    </defs>
+    <rect width="40" height="20" x="70" y="0" rx="3" ry="3" class="background"/>
+    <rect width="75" height="20" clip-path="url(#round-corner)" class="gray-area"/>
+    <text x="11" y="14">solved.ac</text>
+    <text x="92" y="14" class="tier" text-anchor="middle">{tier_title}{tier_rank}</text>
+
+    
+</svg>
+    '''.format(color1=BACKGROUND_COLOR[handle_set.tier_title][0],
+               color2=BACKGROUND_COLOR[handle_set.tier_title][1],
+               color3=BACKGROUND_COLOR[handle_set.tier_title][2],
+               boj_handle=url_set.boj_name,
+               tier_rank=handle_set.tier_rank,
+               tier_title=handle_set.tier_title[0],
                solved=handle_set.solved,
                boj_class=handle_set.boj_class,
                exp=handle_set.exp,
