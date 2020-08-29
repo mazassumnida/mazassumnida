@@ -467,14 +467,15 @@ def generate_badge_mini(request):
             }}
             text {{
                 fill: white;
-                font-family: 'Nunito', sans-serif;
-                font-size: 0.8em;
+                font-family: 'Noto Sans KR', sans-serif;
+                font-size: 0.7em;
             }}
             .gray-area {{
                 fill: #555555;
             }}
             .tier {{
                 font-weight: 700;
+                font-size: 0.78em;
             }}
         ]]>
     </style>
@@ -490,8 +491,8 @@ def generate_badge_mini(request):
     </defs>
     <rect width="40" height="20" x="70" y="0" rx="3" ry="3" class="background"/>
     <rect width="75" height="20" clip-path="url(#round-corner)" class="gray-area"/>
-    <text x="11" y="14">solved.ac</text>
-    <text x="92" y="14" class="tier" text-anchor="middle">{tier_title}{tier_rank}</text>
+    <text text-anchor="middle" alignment-baseline="middle" transform="translate(37.5, 11)">solved.ac</text>
+    <text class="tier" text-anchor="middle" alignment-baseline="middle" transform="translate(92, 11)">{tier_title}{tier_rank}</text>
 
     
 </svg>
