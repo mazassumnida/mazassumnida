@@ -2,7 +2,7 @@
 
 Github 프로필에서 boj 프로필을 이쁘게 보여주는 프로젝트
 [![Solved.ac
-프로필](http://mazassumnida.wtf/mini/api/generate_badge?boj=koosaga)](https://github.com/mazassumnida/mazassumnida)
+프로필](http://mazassumnida.wtf/api/mini/generate_badge?boj=koosaga)](https://github.com/mazassumnida/mazassumnida)
 
 [![Solved.ac
 프로필](http://mazassumnida.wtf/api/v2/generate_badge?boj=malkoring)](https://solved.ac/malkoring)
