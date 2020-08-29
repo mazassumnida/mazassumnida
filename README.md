@@ -1,6 +1,17 @@
 # Project Mazassumnida
 
 Github 프로필에서 boj 프로필을 이쁘게 보여주는 프로젝트
+[![Solved.ac
+프로필](http://mazassumnida.wtf/mini/api/generate_badge?boj=koosaga)](https://github.com/mazassumnida/mazassumnida)
+
+[![Solved.ac
+프로필](http://mazassumnida.wtf/api/v2/generate_badge?boj=malkoring)](https://solved.ac/malkoring)
+
+[![Solved.ac
+프로필](http://mazassumnida.wtf/api/generate_badge?boj=ccoco)](https://solved.ac/ccoco)
+
+[![Solved.ac
+프로필](http://mazassumnida.wtf/api/v2/generate_badge?boj={handle})](https://solved.ac/{handle})
 
 ## install
 
@@ -82,3 +93,32 @@ python manage.py runserver # 서버 실행
 <img src="https://i.ibb.co/Vg2NcZH/chrome-VBCSLd8v-HF.png" alt="chrome-VBCSLd8v-HF" border="0">
 
 
+
+## Mazassumnida v.mini
+
+### Usage
+
+```html
+[![Solved.ac
+프로필](http://mazassumnida.wtf/api/mini/generate_badge?boj={handle})](https://solved.ac/{handle})
+```
+
+### Screenshots
+
+#### Ruby 🍒
+<img src="https://i.ibb.co/JKncFX1/20200830-00-03-45.png" alt="20200830-00-03-45" border="0">
+
+#### Diamond 💎
+<img src="https://i.ibb.co/tJg1mMV/20200830-00-04-09.png" alt="20200830-00-04-09" border="0">
+
+#### Platinum 💚
+<img src="https://i.ibb.co/16SYvHd/20200830-00-04-24.png" alt="20200830-00-04-24" border="0">
+
+#### Gold 🏅
+<img src="https://i.ibb.co/nfJDBKY/20200830-00-03-26.png" alt="20200830-00-03-26" border="0">
+
+#### Silver 💍
+<img src="https://i.ibb.co/Q6SRDZ4/20200830-00-04-37.png" alt="20200830-00-04-37" border="0">
+
+#### Bronze 🍂
+<img src="https://i.ibb.co/tBW5WbQ/20200830-00-04-51.png" alt="20200830-00-04-51" border="0">
