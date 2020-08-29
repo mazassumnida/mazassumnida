@@ -47,20 +47,10 @@ BACKGROUND_COLOR = {
     'Unrated': ['#666666', '#2D2D2D', '#040202'],
     'Bronze': ['#F49347', '#984400', '#492000'],
     'Silver': ['#939195', '#6B7E91', '#1F354A'],
-    'Gold': ['#FFD15F', '#FFD15F', '#FF9910'],
+    'Gold': ['#FFC944', '#FFAF44', '#FF9632'],
     'Platinum': ['#8CC584', '#45B2D3', '#1A836F'],
-    'Diamond': ['#96B8DC', '#3EA5DB', '#1D336A', ],
-    'Ruby': ['#EA6B94', '#E14476', '#6A0022']
-}
-CHANGING_BACKGROUND_COLOR = {
-    'Unknown': ['#AAAAAA', '#666666', '#000000'],
-    'Unrated': ['#949494', '#2D2D2D', '#030202'],
-    'Bronze': ['#FFC597', '#984400', '#6E3100'],
-    'Silver': ['#C0B9C6', '#6B7E91', '#32465A'],
-    'Gold': ['#F1DEAF', '#FFC944', '#CE8728'],
-    'Platinum': ['#B7DDB2', '#42C5D1', '#51A795'],
-    'Diamond': ['#C2DBF6', '#2C94CC', '#415995'],
-    'Ruby': ['#F5A1BF', '#E14476', '#AC1042']
+    'Diamond': ['#96B8DC', '#3EA5DB', '#4D6399', ],
+    'Ruby': ['#E45B62', '#E14476', '#CA0059']
 }
 
 TIER_IMG_LINK = {
@@ -144,6 +134,17 @@ def generate_badge(request):
     <style type="text/css">
         <![CDATA[
             @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=block');
+            @keyframes delayFadeIn {{
+                0%{{
+                    opacity:0
+                }}
+                60%{{
+                    opacity:0
+                }}
+                100%{{
+                    opacity:1
+                }}           
+            }}
             @keyframes fadeIn {{
                 from {{
                     opacity: 0;
@@ -153,10 +154,13 @@ def generate_badge(request):
                 }}
             }}
             @keyframes expBarAnimation {{
-                from {{
+                0% {{
                     stroke-dashoffset: {bar_size};
                 }}
-                to {{
+                70% {{
+                    stroke-dashoffset: {bar_size};
+                }}
+                100%{{
                     stroke-dashoffset: 35;
                 }}
             }}
@@ -170,6 +174,7 @@ def generate_badge(request):
             text.boj-handle {{
                 font-weight: 700;
                 font-size: 1.45em;
+                animation: fadeIn 0.8s ease-in-out forwards;
             }}
             text.tier-text {{
                 font-weight: 700;
@@ -197,26 +202,20 @@ def generate_badge(request):
             }}
             .item {{
                 opacity: 0;
-                animation: fadeIn 0.3s ease-in-out forwards;
+                animation: delayFadeIn 1s ease-in-out forwards;
             }}
             .exp-bar {{
                 stroke-dasharray: {bar_size}; 
                 stroke-dashoffset: {bar_size};
-                animation: expBarAnimation 1s forwards ease-in-out;
+                animation: expBarAnimation 1.5s forwards ease-in-out;
             }}
         ]]>
     </style>
     <defs>
         <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="35%">
-            <stop offset="15%" style="stop-color:{color1};stop-opacity:1">
-                <animate attributeName="stop-color" values="{color1}; {changed_color1}; {color1}; {changed_color1}; {color1};" dur="6s" repeatCount="indefinite"></animate>
-            </stop>
-            <stop offset="55%" style="stop-color:{color2};stop-opacity:1">
-                <animate attributeName="stop-color" values="{color2}; {changed_color2}; {color2}; {changed_color2}; {color2};" dur="6s" repeatCount="indefinite"></animate>
-            </stop>
-            <stop offset="100%" style="stop-color:{color3};stop-opacity:1">
-                <animate attributeName="stop-color" values="{color3}; {changed_color3}; {color3}; {changed_color3}; {color3};" dur="6s" repeatCount="indefinite"></animate>
-            </stop>
+            <stop offset="15%" style="stop-color:{color1};stop-opacity:1"></stop>
+            <stop offset="55%" style="stop-color:{color2};stop-opacity:1"></stop>
+            <stop offset="100%" style="stop-color:{color3};stop-opacity:1"></stop>
         </linearGradient>
     </defs>
     <rect width="350" height="170" rx="10" ry="10" class="background"/>
@@ -241,9 +240,6 @@ def generate_badge(request):
     '''.format(color1=BACKGROUND_COLOR[handle_set.tier_title][0],
                color2=BACKGROUND_COLOR[handle_set.tier_title][1],
                color3=BACKGROUND_COLOR[handle_set.tier_title][2],
-               changed_color1=CHANGING_BACKGROUND_COLOR[handle_set.tier_title][0],
-               changed_color2=CHANGING_BACKGROUND_COLOR[handle_set.tier_title][1],
-               changed_color3=CHANGING_BACKGROUND_COLOR[handle_set.tier_title][2],
                boj_handle=url_set.boj_name,
                tier_rank=handle_set.tier_rank,
                tier_title=handle_set.tier_title,
@@ -279,18 +275,32 @@ def generate_badge_v2(request):
         <![CDATA[
             @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=block');
             @keyframes fadeIn {{
-                from {{
-                    opacity: 0;
+                0%{{
+                    opacity:0
                 }}
-                to {{
-                    opacity: 1;
+                100%{{
+                    opacity:1
                 }}
             }}
+            @keyframes delayFadeIn {{
+                0%{{
+                    opacity:0
+                }}
+                80%{{
+                    opacity:0
+                }}
+                100%{{
+                    opacity:1
+                }}           
+            }}
             @keyframes expBarAnimation {{
-                from {{
+                0% {{
                     stroke-dashoffset: {bar_size};
                 }}
-                to {{
+                70% {{
+                    stroke-dashoffset: {bar_size};
+                }}
+                100%{{
                     stroke-dashoffset: 35;
                 }}
             }}
@@ -304,6 +314,8 @@ def generate_badge_v2(request):
             text.boj-handle {{
                 font-weight: 700;
                 font-size: 1.30em;
+                animation: fadeIn 1s ease-in-out forwards;
+
             }}
             text.tier-text {{
                 font-weight: 700;
@@ -313,7 +325,7 @@ def generate_badge_v2(request):
             text.tier-number {{
                 font-size: 3.1em;
                 font-weight: 700;
-                animation: fadeIn 0.7s ease-in-out forwards;
+                animation: delayFadeIn 2s ease-in-out forwards;
             }}
             .subtitle {{
                 font-weight: 500;
@@ -332,49 +344,77 @@ def generate_badge_v2(request):
             }}
             .item {{
                 opacity: 0;
-                animation: fadeIn 0.3s ease-in-out forwards;
+                animation: delayFadeIn 2s ease-in-out forwards;
             }}
             .exp-bar {{
                 stroke-dasharray: {bar_size}; 
                 stroke-dashoffset: {bar_size};
-                animation: expBarAnimation 1s forwards ease-in-out;
+                animation: expBarAnimation 1.5s forwards ease-in-out;
             }}
             .tier-title {{
-                animation: fadeIn 0.7s ease-in-out forwards;
+                animation: delayFadeIn 2s ease-in-out forwards;
             }}
         ]]>
     </style>
     <defs>
         <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="35%">
            <stop offset="15%" style="stop-color:{color1};stop-opacity:1">
-                <animate attributeName="stop-color" values="{color1}; {changed_color1}; {color1}; {changed_color1}; {color1};" dur="6s" repeatCount="indefinite"></animate>
+                <animate attributeName="stop-opacity" values="0.7; 0.73; 0.9 ; 0.97; 1; 0.97; 0.9; 0.73; 0.7;" dur="4s" repeatCount="indefinite" repeatDur="01:00"></animate>
             </stop>
             <stop offset="55%" style="stop-color:{color2};stop-opacity:1">
-                <animate attributeName="stop-color" values="{color2}; {changed_color2}; {color2}; {changed_color2}; {color2};" dur="6s" repeatCount="indefinite"></animate>
+                <animate attributeName="stop-opacity" values="1; 0.95; 0.93; 0.95; 1;" dur="4s" repeatCount="indefinite" repeatDur="01:00"></animate>
             </stop>
             <stop offset="100%" style="stop-color:{color3};stop-opacity:1">
-                <animate attributeName="stop-color" values="{color3}; {changed_color3}; {color3}; {changed_color3}; {color3};" dur="6s" repeatCount="indefinite"></animate>
+                <animate attributeName="stop-opacity" values="1; 0.97; 0.9; 0.83; 0.8; 0.83; 0.9; 0.97; 1;" dur="4s" repeatCount="indefinite" repeatDur="01:00"></animate>
             </stop>
         </linearGradient>
     </defs>
     <rect width="350" height="170" rx="10" ry="10" class="background"/>
-    <line x1="34" y1="50" x2="34" y2="105" stroke-width="2" stroke="white">
-        <animate attributeName="y2" from="50" to="105" dur="0.3s" /> 
+    <line x1="34" y1="50" x2="34" y2="50" stroke-width="2" stroke="white">
+        <animate attributeName="y2" from="50" to="105" begin="0.5s" dur="0.3s" fill="freeze"
+        calcMode="spline" keyTimes="0 ; 0.25 ; 0.5 ; 0.75 ; 1"
+        keySplines="0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1" /> 
     </line>
     <line x1="34" y1="105" x2="34" y2="105" stroke-width="2" stroke="white">
-        <animate attributeName="x2" from="34" to="67" begin="0.3s" dur="0.15s" fill="freeze" /> 
-        <animate attributeName="y2" from="105" to="125" begin="0.3s" dur="0.15s" fill="freeze" /> 
+        <animate attributeName="x2" from="34" to="67" begin="0.8s" dur="0.2s" fill="freeze" 
+        calcMode="spline" keyTimes="0 ; 0.25 ; 0.5 ; 0.75 ; 1"
+        keySplines="0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1"/> 
+        <animate attributeName="y2" from="105" to="125" begin="0.8s" dur="0.2s" fill="freeze" 
+        calcMode="spline" keyTimes="0 ; 0.25 ; 0.5 ; 0.75 ; 1"
+        keySplines="0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1"/> 
     </line>
     <line x1="67" y1="125" x2="67" y2="125" stroke-width="2" stroke="white">
-        <animate attributeName="x2" from="67" to="100" begin="0.45s" dur="0.15s" fill="freeze" /> 
-        <animate attributeName="y2" from="125" to="105" begin="0.45s" dur="0.15s" fill="freeze" /> 
+        <animate attributeName="x2" from="67" to="100" begin="1s" dur="0.2s" fill="freeze" 
+        calcMode="spline" keyTimes="0 ; 0.25 ; 0.5 ; 0.75 ; 1"
+        keySplines="0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1"/> 
+        <animate attributeName="y2" from="125" to="105" begin="1s" dur="0.2s" fill="freeze" 
+        calcMode="spline" keyTimes="0 ; 0.25 ; 0.5 ; 0.75 ; 1"
+        keySplines="0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1"/> 
     </line>
     <line x1="100" y1="105" x2="100" y2="105" stroke-width="2" stroke="white">
-        <animate attributeName="y2" from="105" to="50" begin="0.6s" dur="0.3s" fill="freeze" /> 
+        <animate attributeName="y2" from="105" to="50" begin="1.2s" dur="0.3s" fill="freeze" 
+        calcMode="spline" keyTimes="0 ; 0.25 ; 0.5 ; 0.75 ; 1"
+        keySplines="0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1"/> 
     </line>
 
-    <line x1="34" y1="110" x2="67" y2="130" stroke-width="2" stroke="white"/>
-    <line x1="100" y1="110" x2="67" y2="130" stroke-width="2" stroke="white"/>
+    <line x1="67" y1="130" x2="67" y2="130" stroke-width="2" stroke="white">
+        <animate attributeName="x2" from="67" to="34" begin="1.5s" dur="0.4s" fill="freeze" 
+        calcMode="spline" keyTimes="0 ; 0.25 ; 0.5 ; 0.75 ; 1"
+        keySplines="0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1" /> 
+        <animate attributeName="y2" from="130" to="110" begin="1.5s" dur="0.4s" fill="freeze" 
+        calcMode="spline" keyTimes="0 ; 0.25 ; 0.5 ; 0.75 ; 1"
+        keySplines="0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1" /> 
+    </line>
+
+    <line x1="67" y1="130" x2="67" y2="130" stroke-width="2" stroke="white">
+        <animate attributeName="x2" from="67" to="100" begin="1.5s" dur="0.4s" fill="freeze"
+        calcMode="spline" keyTimes="0 ; 0.25 ; 0.5 ; 0.75 ; 1"
+        keySplines="0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1"/> 
+        <animate attributeName="y2" from="130" to="110" begin="1.5s" dur="0.4s" fill="freeze"
+        calcMode="spline" keyTimes="0 ; 0.25 ; 0.5 ; 0.75 ; 1"
+        keySplines="0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1"/> 
+    </line>
+
     <text x="135" y="50" class="boj-handle">{boj_handle}</text>
     <image href="{tier_img_link}" x="18" y="12" height="50px" width="100px" class="tier-title"/>
     <text x="52" y="100" class="tier-number">{tier_rank}</text>
@@ -397,9 +437,6 @@ def generate_badge_v2(request):
     '''.format(color1=BACKGROUND_COLOR[handle_set.tier_title][0],
                color2=BACKGROUND_COLOR[handle_set.tier_title][1],
                color3=BACKGROUND_COLOR[handle_set.tier_title][2],
-               changed_color1=CHANGING_BACKGROUND_COLOR[handle_set.tier_title][0],
-               changed_color2=CHANGING_BACKGROUND_COLOR[handle_set.tier_title][1],
-               changed_color3=CHANGING_BACKGROUND_COLOR[handle_set.tier_title][2],
                boj_handle=url_set.boj_name,
                tier_rank=handle_set.tier_rank,
                tier_img_link=TIER_IMG_LINK[handle_set.tier_title],
