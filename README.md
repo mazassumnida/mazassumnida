@@ -1,6 +1,7 @@
 # Project Mazassumnida
 
 Github 프로필에서 boj 프로필을 이쁘게 보여주는 프로젝트
+
 [![Solved.ac
 프로필](http://mazassumnida.wtf/api/mini/generate_badge?boj=koosaga)](https://github.com/mazassumnida/mazassumnida)
 
