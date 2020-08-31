@@ -48,7 +48,7 @@ BACKGROUND_COLOR = {
     'Bronze': ['#F49347', '#984400', '#492000'],
     'Silver': ['#939195', '#6B7E91', '#1F354A'],
     'Gold': ['#FFC944', '#FFAF44', '#FF9632'],
-    'Platinum': ['#8CC584', '#45B2D3', '#1A836F'],
+    'Platinum': ['#8CC584', '#45B2D3', '#51A795'],
     'Diamond': ['#96B8DC', '#3EA5DB', '#4D6399', ],
     'Ruby': ['#E45B62', '#E14476', '#CA0059']
 }
@@ -213,7 +213,7 @@ def generate_badge(request):
     </style>
     <defs>
         <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="35%">
-            <stop offset="15%" style="stop-color:{color1};stop-opacity:1"></stop>
+            <stop offset="10%" style="stop-color:{color1};stop-opacity:1"></stop>
             <stop offset="55%" style="stop-color:{color2};stop-opacity:1"></stop>
             <stop offset="100%" style="stop-color:{color3};stop-opacity:1"></stop>
         </linearGradient>
@@ -358,7 +358,7 @@ def generate_badge_v2(request):
     </style>
     <defs>
         <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="35%">
-           <stop offset="15%" style="stop-color:{color1};stop-opacity:1">
+           <stop offset="10%" style="stop-color:{color1};stop-opacity:1">
                 <animate attributeName="stop-opacity" values="0.7; 0.73; 0.9 ; 0.97; 1; 0.97; 0.9; 0.73; 0.7;" dur="4s" repeatCount="indefinite" repeatDur="01:00"></animate>
             </stop>
             <stop offset="55%" style="stop-color:{color2};stop-opacity:1">
