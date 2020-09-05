@@ -345,49 +345,49 @@ def generate_badge_v2(request):
         </linearGradient>
     </defs>
     <rect width="350" height="170" rx="10" ry="10" class="background"/>
-    <line x1="34" y1="50" x2="34" y2="50" stroke-width="2" stroke="white">
-        <animate attributeName="y2" from="50" to="105" begin="0.5s" dur="0.3s" fill="freeze"
-        calcMode="spline" keyTimes="0 ; 1"
-        keySplines="0.5 0 0.5 1" /> 
+    <line x1="34" y1="50" x2="34" y2="105" stroke-width="2" stroke="white">
+        <animate attributeName="y2" dur="0.8s" fill="freeze"
+        calcMode="spline" keyTimes="0 ; 0.675 ; 1"
+        keySplines="0 0 1 1 ; 0.5 0 0.5 1" values="50 ; 50 ; 105" />
     </line>
-    <line x1="34" y1="105" x2="34" y2="105" stroke-width="2" stroke="white">
-        <animate attributeName="x2" from="34" to="67" begin="0.8s" dur="0.2s" fill="freeze" 
-        calcMode="spline" keyTimes="0 ; 1"
-        keySplines="0.5 0 0.5 1"/> 
-        <animate attributeName="y2" from="105" to="125" begin="0.8s" dur="0.2s" fill="freeze" 
-        calcMode="spline" keyTimes="0 ; 1"
-        keySplines="0.5 0 0.5 1"/> 
+    <line x1="34" y1="105" x2="67" y2="125" stroke-width="2" stroke="white">
+        <animate attributeName="x2" dur="1s" fill="freeze" 
+        calcMode="spline" keyTimes="0 ; 0.8 ; 1"
+        keySplines="0 0 1 1 ; 0.5 0 0.5 1" values="34 ; 34 ; 67" />
+        <animate attributeName="y2" dur="1s" fill="freeze" 
+        calcMode="spline" keyTimes="0 ; 0.8 ; 1"
+        keySplines="0 0 1 1 ; 0.5 0 0.5 1" values="105 ; 105 ; 125" />
     </line>
-    <line x1="67" y1="125" x2="67" y2="125" stroke-width="2" stroke="white">
-        <animate attributeName="x2" from="67" to="100" begin="1s" dur="0.2s" fill="freeze" 
-        calcMode="spline" keyTimes="0 ; 1"
-        keySplines="0.5 0 0.5 1"/> 
-        <animate attributeName="y2" from="125" to="105" begin="1s" dur="0.2s" fill="freeze" 
-        calcMode="spline" keyTimes="0 ; 1"
-        keySplines="0.5 0 0.5 1"/> 
+    <line x1="67" y1="125" x2="100" y2="105" stroke-width="2" stroke="white">
+        <animate attributeName="x2" dur="1.2s" fill="freeze" 
+        calcMode="spline" keyTimes="0 ; 0.83333 ; 1"
+        keySplines="0 0 1 1 ; 0.5 0 0.5 1" values="67 ; 67 ; 100" />
+        <animate attributeName="y2" dur="1.2s" fill="freeze" 
+        calcMode="spline" keyTimes="0 ; 0.83333 ; 1"
+        keySplines="0 0 1 1 ; 0.5 0 0.5 1" values="125 ; 125 ; 105" />
     </line>
-    <line x1="100" y1="105" x2="100" y2="105" stroke-width="2" stroke="white">
-        <animate attributeName="y2" from="105" to="50" begin="1.2s" dur="0.3s" fill="freeze" 
-        calcMode="spline" keyTimes="0 ; 1"
-        keySplines="0.5 0 0.5 1"/> 
-    </line>
-
-    <line x1="67" y1="130" x2="67" y2="130" stroke-width="2" stroke="white">
-        <animate attributeName="x2" from="67" to="34" begin="1.5s" dur="0.4s" fill="freeze" 
-        calcMode="spline" keyTimes="0 ; 1"
-        keySplines="0.5 0 0.5 1" /> 
-        <animate attributeName="y2" from="130" to="110" begin="1.5s" dur="0.4s" fill="freeze" 
-        calcMode="spline" keyTimes="0 ; 1"
-        keySplines="0.5 0 0.5 1" /> 
+    <line x1="100" y1="105" x2="100" y2="50" stroke-width="2" stroke="white">
+        <animate attributeName="y2" dur="1.5s" fill="freeze" 
+        calcMode="spline" keyTimes="0 ; 0.8 ; 1"
+        keySplines="0 0 1 1 ; 0.5 0 0.5 1" values="105 ; 105 ; 50" />
     </line>
 
-    <line x1="67" y1="130" x2="67" y2="130" stroke-width="2" stroke="white">
-        <animate attributeName="x2" from="67" to="100" begin="1.5s" dur="0.4s" fill="freeze"
-        calcMode="spline" keyTimes="0 ; 1"
-        keySplines="0.5 0 0.5 1"/> 
-        <animate attributeName="y2" from="130" to="110" begin="1.5s" dur="0.4s" fill="freeze"
-        calcMode="spline" keyTimes="0 ; 1"
-        keySplines="0.5 0 0.5 1"/> 
+    <line x1="67" y1="130" x2="34" y2="110" stroke-width="2" stroke="white">
+        <animate attributeName="x2" dur="1.9s" fill="freeze" 
+        calcMode="spline" keyTimes="0 ; 0.78947; 1"
+        keySplines="0 0 1 1 ; 0.5 0 0.5 1" values="67 ; 67 ; 34" />
+        <animate attributeName="y2" dur="1.9s" fill="freeze" 
+        calcMode="spline" keyTimes="0 ; 0.78947 ; 1"
+        keySplines="0 0 1 1 ; 0.5 0 0.5 1" values="130 ; 130 ; 110" />
+    </line>
+
+    <line x1="67" y1="130" x2="100" y2="110" stroke-width="2" stroke="white">
+        <animate attributeName="x2" dur="1.9s" fill="freeze"
+        calcMode="spline" keyTimes="0 ; 0.78947 ; 1"
+        keySplines="0 0 1 1 ; 0.5 0 0.5 1" values="67 ; 67 ; 100" />
+        <animate attributeName="y2" dur="1.9s" fill="freeze"
+        calcMode="spline" keyTimes="0 ; 0.78947 ; 1"
+        keySplines="0 0 1 1 ; 0.5 0 0.5 1" values="130 ; 130 ; 110" />
     </line>
 
     <text x="135" y="50" class="boj-handle">{boj_handle}</text>
