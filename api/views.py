@@ -61,6 +61,11 @@ class BojDefaultSettings(object):
             self.level = self.json['level']
             self.solved = '{0:n}'.format(self.json['solved'])
             self.boj_class = self.json['class']
+            self.boj_class_decoration = ''
+            if self.json['class_decoration'] == 1:
+                self.boj_class_decoration = '+'
+            elif self.json['class_decoration'] == 2:
+                self.boj_class_decoration = '++'
 
             self.next_exp = self.json['next_exp_cap']
             self.prev_exp = self.json['previous_exp_cap']
@@ -85,6 +90,7 @@ class BojDefaultSettings(object):
             self.tier_rank = ''
             self.solved = '0'
             self.boj_class = '0'
+            self.boj_class_decoration = ''
             self.exp = '0'
             self.now_exp = '0'
             self.needed_exp = '0'
@@ -197,7 +203,7 @@ def generate_badge(request):
     <text x="315" y="50" class="tier-text" text-anchor="end" >{tier_title}{tier_rank}</text>
     <text x="35" y="50" class="boj-handle">{boj_handle}</text>
     <g class="item" style="animation-delay: 200ms">
-        <text x="35" y="79" class="subtitle">class</text><text x="145" y="79" class="class value">{boj_class}</text>
+        <text x="35" y="79" class="subtitle">class</text><text x="145" y="79" class="class value">{boj_class}{boj_class_decoration}</text>
     </g>
     <g class="item" style="animation-delay: 400ms">
         <text x="35" y="99" class="subtitle">solved</text><text x="145" y="99" class="solved value">{solved}</text>
@@ -220,6 +226,7 @@ def generate_badge(request):
                tier_title=handle_set.tier_title,
                solved=handle_set.solved,
                boj_class=handle_set.boj_class,
+               boj_class_decoration=handle_set.boj_class_decoration,
                exp=handle_set.exp,
                now_exp=handle_set.now_exp,
                needed_exp=handle_set.needed_exp,
@@ -395,7 +402,7 @@ def generate_badge_v2(request):
     <image href="{tier_img_link}" x="18" y="12" height="50px" width="100px" class="tier-title"/>
     <text x="52" y="100" class="tier-number">{tier_rank}</text>
     <g class="item" style="animation-delay: 200ms">
-        <text x="135" y="79" class="subtitle">class</text><text x="225" y="79" class="class value">{boj_class}</text>
+        <text x="135" y="79" class="subtitle">class</text><text x="225" y="79" class="class value">{boj_class}{boj_class_decoration}</text>
     </g>
     <g class="item" style="animation-delay: 400ms">
         <text x="135" y="99" class="subtitle">solved</text><text x="225" y="99" class="solved value">{solved}</text>
@@ -418,6 +425,7 @@ def generate_badge_v2(request):
                tier_img_link=TIER_IMG_LINK[handle_set.tier_title],
                solved=handle_set.solved,
                boj_class=handle_set.boj_class,
+               boj_class_decoration=handle_set.boj_class_decoration,
                exp=handle_set.exp,
                now_exp=handle_set.now_exp,
                needed_exp=handle_set.needed_exp,
