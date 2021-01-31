@@ -1,6 +1,7 @@
 # Project Mazassumnida
 
 Github 프로필에서 boj 프로필을 이쁘게 보여주는 프로젝트
+(2021.01.31) 현재 heroku free dyno hours를 모두 소진하여 사진이 제대로 뜨지 않는 문제가 있습니다. free dyno hours가 초기화되는 내일 오후부터는 잘 돌아갈 예정입니다. 😭
 
 [![Solved.ac
 프로필](http://mazassumnida.wtf/api/mini/generate_badge?boj=koosaga)](https://github.com/mazassumnida/mazassumnida)
