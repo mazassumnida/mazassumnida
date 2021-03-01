@@ -56,7 +56,7 @@ TIER_RATES = (
 
 class UrlSettings(object):
     def __init__(self, request, MAX_LEN):
-        self.api_server = "https://api.solved.ac"
+        self.api_server = os.environ['API_SERVER']
         self.boj_handle = request.GET.get("boj", "ccoco")
         if len(self.boj_handle) > MAX_LEN:
             self.boj_name = self.boj_handle[:(MAX_LEN - 2)] + "..."
