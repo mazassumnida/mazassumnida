@@ -3,9 +3,17 @@ import requests
 import locale
 
 from django.http import HttpResponse
-from .images import UNKNOWN, UNRATED, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND, RUBY
+from .images import UNKNOWN, UNRATED, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND, RUBY, MASTER
 
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+
+'''
+TODO
+MASTER 이미지 추가
+경험치 바 대신 랭크 바
+exp -> rating
+순서: rating / class / solved
+'''
 
 # Create your views here.
 TIERS = (
@@ -16,6 +24,7 @@ TIERS = (
     "Platinum 5", "Platinum 4", "Platinum 3", "Platinum 2", "Platinum 1",
     "Diamond 5", "Diamond 4", "Diamond 3", "Diamond 2", "Diamond 1",
     "Ruby 5", "Ruby 4", "Ruby 3", "Ruby 2", "Ruby 1",
+    "MASTER"
 )
 
 BACKGROUND_COLOR = {
@@ -26,7 +35,8 @@ BACKGROUND_COLOR = {
     'Gold': ['#FFC944', '#FFAF44', '#FF9632'],
     'Platinum': ['#8CC584', '#45B2D3', '#51A795'],
     'Diamond': ['#96B8DC', '#3EA5DB', '#4D6399', ],
-    'Ruby': ['#E45B62', '#E14476', '#CA0059']
+    'Ruby': ['#E45B62', '#E14476', '#CA0059'],
+    'MASTER': ['#83f8fe', '#b297fc', '#fc7ea8'],
 }
 
 TIER_IMG_LINK = {
@@ -37,13 +47,14 @@ TIER_IMG_LINK = {
     'Gold': GOLD,
     'Platinum': PLATINUM,
     'Diamond': DIAMOND,
-    'Ruby': RUBY
+    'Ruby': RUBY,
+    'MASTER': MASTER
 }
 
 
 class UrlSettings(object):
     def __init__(self, request, MAX_LEN):
-        self.api_server = os.environ['API_SERVER']
+        self.api_server = "https://api.solved.ac"
         self.boj_handle = request.GET.get("boj", "ccoco")
         if len(self.boj_handle) > MAX_LEN:
             self.boj_name = self.boj_handle[:(MAX_LEN - 2)] + "..."
@@ -58,7 +69,8 @@ class BojDefaultSettings(object):
         try:
             self.json = requests.get(url_set.user_information_url).json()
             self.json = self.json["result"]['user'][0]
-            self.level = self.json['level']
+            self.rating = self.json['rating']
+            self.level = self.boj_rating_to_lv(self.json['rating'])
             self.solved = '{0:n}'.format(self.json['solved'])
             self.boj_class = self.json['class']
             self.boj_class_decoration = ''
@@ -79,7 +91,7 @@ class BojDefaultSettings(object):
             self.now_exp = '{0:n}'.format(self.my_exp - self.prev_exp)
             self.exp = '{0:n}'.format(self.my_exp)
 
-            if TIERS[self.level] == 'Unrated':
+            if TIERS[self.level] == 'Unrated' or TIERS[self.level] == 'MASTER':
                 self.tier_title = TIERS[self.level]
                 self.tier_rank = ''
             else:
@@ -96,6 +108,19 @@ class BojDefaultSettings(object):
             self.needed_exp = '0'
             self.percentage = '0'
             self.bar_size = '35'
+    
+    def boj_rating_to_lv(self, rating):
+        if rating < 30: return 0
+        if rating < 150: return rating // 30
+        if rating < 200: return 5
+        if rating < 500: return (rating-200) // 100 + 6
+        if rating < 1400: return (rating-500) // 150 + 9
+        if rating < 1600: return 15
+        if rating < 1750: return 16
+        if rating < 1900: return 17
+        if rating < 2800: return (rating-1900) // 100 + 18
+        if rating < 3000: return (rating-2800) // 50 + 27
+        return 31
 
 
 def generate_badge(request):
@@ -203,13 +228,13 @@ def generate_badge(request):
     <text x="315" y="50" class="tier-text" text-anchor="end" >{tier_title}{tier_rank}</text>
     <text x="35" y="50" class="boj-handle">{boj_handle}</text>
     <g class="item" style="animation-delay: 200ms">
-        <text x="35" y="79" class="subtitle">class</text><text x="145" y="79" class="class value">{boj_class}{boj_class_decoration}</text>
+        <text x="35" y="79" class="subtitle">rating</text><text x="145" y="79" class="class value">{rating}</text>
     </g>
     <g class="item" style="animation-delay: 400ms">
-        <text x="35" y="99" class="subtitle">solved</text><text x="145" y="99" class="solved value">{solved}</text>
+        <text x="35" y="99" class="subtitle">class</text><text x="145" y="99" class="solved value">{boj_class}{boj_class_decoration}</text>
     </g>
     <g class="item" style="animation-delay: 600ms">
-        <text x="35" y="119" class="subtitle">exp</text><text x="145" y="119" class="something value">{exp}</text>
+        <text x="35" y="119" class="subtitle">solved</text><text x="145" y="119" class="something value">{solved}</text>
     </g>
     <g class="exp-bar" style="animation-delay: 800ms">
         <line x1="35" y1="142" x2="{bar_size}" y2="142" stroke-width="4" stroke="floralwhite" stroke-linecap="round"/>
@@ -224,10 +249,10 @@ def generate_badge(request):
                boj_handle=url_set.boj_name,
                tier_rank=handle_set.tier_rank,
                tier_title=handle_set.tier_title,
+               rating=handle_set.rating,
                solved=handle_set.solved,
                boj_class=handle_set.boj_class,
                boj_class_decoration=handle_set.boj_class_decoration,
-               exp=handle_set.exp,
                now_exp=handle_set.now_exp,
                needed_exp=handle_set.needed_exp,
                percentage=handle_set.percentage,
