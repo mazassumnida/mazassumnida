@@ -7,14 +7,6 @@ from .images import UNKNOWN, UNRATED, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND, R
 
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
-'''
-TODO
-MASTER 이미지 추가
-경험치 바 대신 랭크 바
-exp -> rating
-순서: rating / class / solved
-'''
-
 # Create your views here.
 TIERS = (
     "Unrated",
@@ -24,7 +16,7 @@ TIERS = (
     "Platinum 5", "Platinum 4", "Platinum 3", "Platinum 2", "Platinum 1",
     "Diamond 5", "Diamond 4", "Diamond 3", "Diamond 2", "Diamond 1",
     "Ruby 5", "Ruby 4", "Ruby 3", "Ruby 2", "Ruby 1",
-    "MASTER"
+    "Master"
 )
 
 BACKGROUND_COLOR = {
@@ -36,7 +28,7 @@ BACKGROUND_COLOR = {
     'Platinum': ['#8CC584', '#45B2D3', '#51A795'],
     'Diamond': ['#96B8DC', '#3EA5DB', '#4D6399', ],
     'Ruby': ['#E45B62', '#E14476', '#CA0059'],
-    'MASTER': ['#83f8fe', '#b297fc', '#fc7ea8'],
+    'Master': ['#83f8fe', '#b297fc', '#fc7ea8'],
 }
 
 TIER_IMG_LINK = {
@@ -48,7 +40,7 @@ TIER_IMG_LINK = {
     'Platinum': PLATINUM,
     'Diamond': DIAMOND,
     'Ruby': RUBY,
-    'MASTER': MASTER
+    'Master': MASTER
 }
 
 TIER_RATES = (
@@ -64,7 +56,7 @@ TIER_RATES = (
 
 class UrlSettings(object):
     def __init__(self, request, MAX_LEN):
-        self.api_server = "https://api.solved.ac"
+        self.api_server = os.environ['API_SERVER']
         self.boj_handle = request.GET.get("boj", "ccoco")
         if len(self.boj_handle) > MAX_LEN:
             self.boj_name = self.boj_handle[:(MAX_LEN - 2)] + "..."
@@ -105,7 +97,7 @@ class BojDefaultSettings(object):
             self.now_rate = '{0:n}'.format(self.my_rate)
             self.rate = '{0:n}'.format(self.my_rate)
 
-            if TIERS[self.level] == 'Unrated' or TIERS[self.level] == 'MASTER':
+            if TIERS[self.level] == 'Unrated' or TIERS[self.level] == 'Master':
                 self.tier_title = TIERS[self.level]
                 self.tier_rank = ''
             else:
@@ -242,13 +234,13 @@ def generate_badge(request):
     <text x="315" y="50" class="tier-text" text-anchor="end" >{tier_title}{tier_rank}</text>
     <text x="35" y="50" class="boj-handle">{boj_handle}</text>
     <g class="item" style="animation-delay: 200ms">
-        <text x="35" y="79" class="subtitle">rating</text><text x="145" y="79" class="class value">{rating}</text>
+        <text x="35" y="79" class="subtitle">rate</text><text x="145" y="79" class="rate value">{rate}</text>
     </g>
     <g class="item" style="animation-delay: 400ms">
-        <text x="35" y="99" class="subtitle">class</text><text x="145" y="99" class="solved value">{boj_class}{boj_class_decoration}</text>
+        <text x="35" y="99" class="subtitle">solved</text><text x="145" y="99" class="solved value">{solved}</text>
     </g>
     <g class="item" style="animation-delay: 600ms">
-        <text x="35" y="119" class="subtitle">rate</text><text x="145" y="119" class="something value">{rate}</text>
+        <text x="35" y="119" class="subtitle">class</text><text x="145" y="119" class="class value">{boj_class}{boj_class_decoration}</text>
     </g>
     <g class="rate-bar" style="animation-delay: 800ms">
         <line x1="35" y1="142" x2="{bar_size}" y2="142" stroke-width="4" stroke="floralwhite" stroke-linecap="round"/>
@@ -263,7 +255,6 @@ def generate_badge(request):
                boj_handle=url_set.boj_name,
                tier_rank=handle_set.tier_rank,
                tier_title=handle_set.tier_title,
-               rating=handle_set.rating,
                solved=handle_set.solved,
                boj_class=handle_set.boj_class,
                boj_class_decoration=handle_set.boj_class_decoration,
@@ -284,7 +275,6 @@ def generate_badge_v2(request):
     MAX_LEN = 15
     url_set = UrlSettings(request, MAX_LEN)
     handle_set = BojDefaultSettings(request, url_set)
-    print(handle_set.my_rate)
     svg = '''
     <!DOCTYPE svg PUBLIC
         "-//W3C//DTD SVG 1.1//EN"
@@ -348,6 +338,7 @@ def generate_badge_v2(request):
             text.tier-number {{
                 font-size: 3.1em;
                 font-weight: 700;
+                text-anchor: middle;
                 animation: delayFadeIn 2s ease-in-out forwards;
             }}
             .subtitle {{
@@ -381,7 +372,7 @@ def generate_badge_v2(request):
     </style>
     <defs>
         <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="35%">
-           <stop offset="10%" style="stop-color:{color1};stop-opacity:1">
+            <stop offset="10%" style="stop-color:{color1};stop-opacity:1">
                 <animate attributeName="stop-opacity" values="0.7; 0.73; 0.9 ; 0.97; 1; 0.97; 0.9; 0.73; 0.7;" dur="4s" repeatCount="indefinite" repeatDur="01:00"></animate>
             </stop>
             <stop offset="55%" style="stop-color:{color2};stop-opacity:1">
@@ -440,15 +431,15 @@ def generate_badge_v2(request):
 
     <text x="135" y="50" class="boj-handle">{boj_handle}</text>
     <image href="{tier_img_link}" x="18" y="12" height="50px" width="100px" class="tier-title"/>
-    <text x="52" y="100" class="tier-number">{tier_rank}</text>
+    <text x="67" y="100" class="tier-number">{tier_rank}</text>
     <g class="item" style="animation-delay: 200ms">
-        <text x="135" y="79" class="subtitle">class</text><text x="225" y="79" class="class value">{boj_class}{boj_class_decoration}</text>
+        <text x="135" y="79" class="subtitle">rate</text><text x="225" y="79" class="rate value">{rate}</text>
     </g>
     <g class="item" style="animation-delay: 400ms">
         <text x="135" y="99" class="subtitle">solved</text><text x="225" y="99" class="solved value">{solved}</text>
     </g>
     <g class="item" style="animation-delay: 600ms">
-        <text x="135" y="119" class="subtitle">rate</text><text x="225" y="119" class="something value">{rate}</text>
+        <text x="135" y="119" class="subtitle">class</text><text x="225" y="119" class="class value">{boj_class}{boj_class_decoration}</text>
     </g>
     <g class="rate-bar" style="animation-delay: 800ms">
         <line x1="35" y1="142" x2="{bar_size}" y2="142" stroke-width="4" stroke="floralwhite" stroke-linecap="round"/>
@@ -461,7 +452,7 @@ def generate_badge_v2(request):
                color2=BACKGROUND_COLOR[handle_set.tier_title][1],
                color3=BACKGROUND_COLOR[handle_set.tier_title][2],
                boj_handle=url_set.boj_name,
-               tier_rank=handle_set.tier_rank,
+               tier_rank=('M' if handle_set.tier_title == 'Master' else handle_set.tier_rank),
                tier_img_link=TIER_IMG_LINK[handle_set.tier_title],
                solved=handle_set.solved,
                boj_class=handle_set.boj_class,
