@@ -51,6 +51,16 @@ TIER_IMG_LINK = {
     'MASTER': MASTER
 }
 
+TIER_RATES = (
+    0, # unranked
+    30, 60, 90, 120, 150, # bronze
+    200, 300, 400, 500, 650, # silver
+    800, 950, 1100, 1250, 1400, # gold
+    1600, 1750, 1900, 2000, 2100, # platinum
+    2200, 2300, 2400, 2500, 2600, # diamond
+    2700, 2800, 2850, 2900, 2950, # ruby
+    3000 # master
+)
 
 class UrlSettings(object):
     def __init__(self, request, MAX_LEN):
@@ -79,17 +89,21 @@ class BojDefaultSettings(object):
             elif self.json['class_decoration'] == 2:
                 self.boj_class_decoration = '++'
 
-            self.next_exp = self.json['next_exp_cap']
-            self.prev_exp = self.json['previous_exp_cap']
-            self.exp_gap = self.next_exp - self.prev_exp
-            self.my_exp = self.json['exp']
-            self.percentage = round(
-                (self.my_exp - self.prev_exp) * 100 / self.exp_gap)
+            self.my_rate = self.json['rating']
+            if self.level == 31:
+                self.prev_rate = TIER_RATES[self.level]
+                self.next_rate = TIER_RATES[self.level]
+                self.percentage = 100
+            else:
+                self.prev_rate = TIER_RATES[self.level]
+                self.next_rate = TIER_RATES[self.level+1]
+                self.percentage = round(
+                    (self.my_rate - self.prev_rate) * 100 / (self.next_rate - self.prev_rate))
             self.bar_size = 35 + 2.55 * self.percentage
 
-            self.needed_exp = '{0:n}'.format(self.next_exp - self.prev_exp)
-            self.now_exp = '{0:n}'.format(self.my_exp - self.prev_exp)
-            self.exp = '{0:n}'.format(self.my_exp)
+            self.needed_rate = '{0:n}'.format(self.next_rate)
+            self.now_rate = '{0:n}'.format(self.my_rate)
+            self.rate = '{0:n}'.format(self.my_rate)
 
             if TIERS[self.level] == 'Unrated' or TIERS[self.level] == 'MASTER':
                 self.tier_title = TIERS[self.level]
@@ -103,12 +117,12 @@ class BojDefaultSettings(object):
             self.solved = '0'
             self.boj_class = '0'
             self.boj_class_decoration = ''
-            self.exp = '0'
-            self.now_exp = '0'
-            self.needed_exp = '0'
+            self.rate = '0'
+            self.now_rate = '0'
+            self.needed_rate = '0'
             self.percentage = '0'
             self.bar_size = '35'
-    
+
     def boj_rating_to_lv(self, rating):
         if rating < 30: return 0
         if rating < 150: return rating // 30
@@ -129,13 +143,13 @@ def generate_badge(request):
     handle_set = BojDefaultSettings(request, url_set)
 
     svg = '''
-    <!DOCTYPE svg PUBLIC 
-        "-//W3C//DTD SVG 1.1//EN" 
+    <!DOCTYPE svg PUBLIC
+        "-//W3C//DTD SVG 1.1//EN"
         "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg height="170" width="350"   
-    version="1.1" 
-    xmlns="http://www.w3.org/2000/svg" 
-    xmlns:xlink="http://www.w3.org/1999/xlink" 
+<svg height="170" width="350"
+    version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
     xml:space="preserve">
     <style type="text/css">
         <![CDATA[
@@ -149,7 +163,7 @@ def generate_badge(request):
                 }}
                 100%{{
                     opacity:1
-                }}           
+                }}
             }}
             @keyframes fadeIn {{
                 from {{
@@ -211,7 +225,7 @@ def generate_badge(request):
                 animation: delayFadeIn 1s ease-in-out forwards;
             }}
             .exp-bar {{
-                stroke-dasharray: {bar_size}; 
+                stroke-dasharray: {bar_size};
                 stroke-dashoffset: {bar_size};
                 animation: expBarAnimation 1.5s forwards ease-in-out;
             }}
@@ -234,14 +248,14 @@ def generate_badge(request):
         <text x="35" y="99" class="subtitle">class</text><text x="145" y="99" class="solved value">{boj_class}{boj_class_decoration}</text>
     </g>
     <g class="item" style="animation-delay: 600ms">
-        <text x="35" y="119" class="subtitle">solved</text><text x="145" y="119" class="something value">{solved}</text>
+        <text x="35" y="119" class="subtitle">rate</text><text x="145" y="119" class="something value">{rate}</text>
     </g>
-    <g class="exp-bar" style="animation-delay: 800ms">
+    <g class="rate-bar" style="animation-delay: 800ms">
         <line x1="35" y1="142" x2="{bar_size}" y2="142" stroke-width="4" stroke="floralwhite" stroke-linecap="round"/>
     </g>
     <line x1="35" y1="142" x2="290" y2="142" stroke-width="4" stroke-opacity="40%" stroke="floralwhite" stroke-linecap="round"/>
     <text x="297" y="142" alignment-baseline="middle" class="percentage">{percentage}%</text>
-    <text x="293" y="157" class="progress" text-anchor="end">{now_exp} / {needed_exp}</text>
+    <text x="293" y="157" class="progress" text-anchor="end">{now_rate} / {needed_rate}</text>
 </svg>
     '''.format(color1=BACKGROUND_COLOR[handle_set.tier_title][0],
                color2=BACKGROUND_COLOR[handle_set.tier_title][1],
@@ -253,8 +267,9 @@ def generate_badge(request):
                solved=handle_set.solved,
                boj_class=handle_set.boj_class,
                boj_class_decoration=handle_set.boj_class_decoration,
-               now_exp=handle_set.now_exp,
-               needed_exp=handle_set.needed_exp,
+               rate=handle_set.rate,
+               now_rate=handle_set.now_rate,
+               needed_rate=handle_set.needed_rate,
                percentage=handle_set.percentage,
                bar_size=handle_set.bar_size)
 
@@ -269,15 +284,15 @@ def generate_badge_v2(request):
     MAX_LEN = 15
     url_set = UrlSettings(request, MAX_LEN)
     handle_set = BojDefaultSettings(request, url_set)
-
+    print(handle_set.my_rate)
     svg = '''
-    <!DOCTYPE svg PUBLIC 
-        "-//W3C//DTD SVG 1.1//EN" 
+    <!DOCTYPE svg PUBLIC
+        "-//W3C//DTD SVG 1.1//EN"
         "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg height="170" width="350"   
-    version="1.1" 
-    xmlns="http://www.w3.org/2000/svg" 
-    xmlns:xlink="http://www.w3.org/1999/xlink" 
+<svg height="170" width="350"
+    version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
     xml:space="preserve">
     <style type="text/css">
         <![CDATA[
@@ -299,7 +314,7 @@ def generate_badge_v2(request):
                 }}
                 100%{{
                     opacity:1
-                }}           
+                }}
             }}
             @keyframes expBarAnimation {{
                 0% {{
@@ -355,7 +370,7 @@ def generate_badge_v2(request):
                 animation: delayFadeIn 2s ease-in-out forwards;
             }}
             .exp-bar {{
-                stroke-dasharray: {bar_size}; 
+                stroke-dasharray: {bar_size};
                 stroke-dashoffset: {bar_size};
                 animation: expBarAnimation 1.5s forwards ease-in-out;
             }}
@@ -384,32 +399,32 @@ def generate_badge_v2(request):
         keySplines="0 0 1 1 ; 0.5 0 0.5 1" values="50 ; 50 ; 105" />
     </line>
     <line x1="34" y1="105" x2="67" y2="125" stroke-width="2" stroke="white">
-        <animate attributeName="x2" dur="1s" fill="freeze" 
+        <animate attributeName="x2" dur="1s" fill="freeze"
         calcMode="spline" keyTimes="0 ; 0.8 ; 1"
         keySplines="0 0 1 1 ; 0.5 0 0.5 1" values="34 ; 34 ; 67" />
-        <animate attributeName="y2" dur="1s" fill="freeze" 
+        <animate attributeName="y2" dur="1s" fill="freeze"
         calcMode="spline" keyTimes="0 ; 0.8 ; 1"
         keySplines="0 0 1 1 ; 0.5 0 0.5 1" values="105 ; 105 ; 125" />
     </line>
     <line x1="67" y1="125" x2="100" y2="105" stroke-width="2" stroke="white">
-        <animate attributeName="x2" dur="1.2s" fill="freeze" 
+        <animate attributeName="x2" dur="1.2s" fill="freeze"
         calcMode="spline" keyTimes="0 ; 0.83333 ; 1"
         keySplines="0 0 1 1 ; 0.5 0 0.5 1" values="67 ; 67 ; 100" />
-        <animate attributeName="y2" dur="1.2s" fill="freeze" 
+        <animate attributeName="y2" dur="1.2s" fill="freeze"
         calcMode="spline" keyTimes="0 ; 0.83333 ; 1"
         keySplines="0 0 1 1 ; 0.5 0 0.5 1" values="125 ; 125 ; 105" />
     </line>
     <line x1="100" y1="105" x2="100" y2="50" stroke-width="2" stroke="white">
-        <animate attributeName="y2" dur="1.5s" fill="freeze" 
+        <animate attributeName="y2" dur="1.5s" fill="freeze"
         calcMode="spline" keyTimes="0 ; 0.8 ; 1"
         keySplines="0 0 1 1 ; 0.5 0 0.5 1" values="105 ; 105 ; 50" />
     </line>
 
     <line x1="67" y1="130" x2="34" y2="110" stroke-width="2" stroke="white">
-        <animate attributeName="x2" dur="1.9s" fill="freeze" 
+        <animate attributeName="x2" dur="1.9s" fill="freeze"
         calcMode="spline" keyTimes="0 ; 0.78947; 1"
         keySplines="0 0 1 1 ; 0.5 0 0.5 1" values="67 ; 67 ; 34" />
-        <animate attributeName="y2" dur="1.9s" fill="freeze" 
+        <animate attributeName="y2" dur="1.9s" fill="freeze"
         calcMode="spline" keyTimes="0 ; 0.78947 ; 1"
         keySplines="0 0 1 1 ; 0.5 0 0.5 1" values="130 ; 130 ; 110" />
     </line>
@@ -433,14 +448,14 @@ def generate_badge_v2(request):
         <text x="135" y="99" class="subtitle">solved</text><text x="225" y="99" class="solved value">{solved}</text>
     </g>
     <g class="item" style="animation-delay: 600ms">
-        <text x="135" y="119" class="subtitle">exp</text><text x="225" y="119" class="something value">{exp}</text>
+        <text x="135" y="119" class="subtitle">rate</text><text x="225" y="119" class="something value">{rate}</text>
     </g>
-    <g class="exp-bar" style="animation-delay: 800ms">
+    <g class="rate-bar" style="animation-delay: 800ms">
         <line x1="35" y1="142" x2="{bar_size}" y2="142" stroke-width="4" stroke="floralwhite" stroke-linecap="round"/>
     </g>
     <line x1="35" y1="142" x2="290" y2="142" stroke-width="4" stroke-opacity="40%" stroke="floralwhite" stroke-linecap="round"/>
     <text x="297" y="142" alignment-baseline="middle" class="percentage">{percentage}%</text>
-    <text x="293" y="157" class="progress" text-anchor="end">{now_exp} / {needed_exp}</text>
+    <text x="293" y="157" class="progress" text-anchor="end">{now_rate} / {needed_rate}</text>
 </svg>
     '''.format(color1=BACKGROUND_COLOR[handle_set.tier_title][0],
                color2=BACKGROUND_COLOR[handle_set.tier_title][1],
@@ -451,9 +466,9 @@ def generate_badge_v2(request):
                solved=handle_set.solved,
                boj_class=handle_set.boj_class,
                boj_class_decoration=handle_set.boj_class_decoration,
-               exp=handle_set.exp,
-               now_exp=handle_set.now_exp,
-               needed_exp=handle_set.needed_exp,
+               rate=handle_set.rate,
+               now_rate=handle_set.now_rate,
+               needed_rate=handle_set.needed_rate,
                percentage=handle_set.percentage,
                bar_size=handle_set.bar_size)
 
@@ -469,13 +484,13 @@ def generate_badge_mini(request):
     handle_set = BojDefaultSettings(request, url_set)
 
     svg = '''
-    <!DOCTYPE svg PUBLIC 
-        "-//W3C//DTD SVG 1.1//EN" 
+    <!DOCTYPE svg PUBLIC
+        "-//W3C//DTD SVG 1.1//EN"
         "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg height="20" width="110"   
-    version="1.1" 
-    xmlns="http://www.w3.org/2000/svg" 
-    xmlns:xlink="http://www.w3.org/1999/xlink" 
+<svg height="20" width="110"
+    version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
     xml:space="preserve">
     <style type="text/css">
         <![CDATA[
@@ -529,7 +544,7 @@ def generate_badge_mini(request):
     <text text-anchor="middle" alignment-baseline="middle" transform="translate(37.5, 11)">solved.ac</text>
     <text class="tier" text-anchor="middle" alignment-baseline="middle" transform="translate(92, 11)">{tier_title}{tier_rank}</text>
 
-    
+
 </svg>
     '''.format(color1=BACKGROUND_COLOR[handle_set.tier_title][0],
                color2=BACKGROUND_COLOR[handle_set.tier_title][1],
@@ -539,9 +554,9 @@ def generate_badge_mini(request):
                tier_title=handle_set.tier_title[0],
                solved=handle_set.solved,
                boj_class=handle_set.boj_class,
-               exp=handle_set.exp,
-               now_exp=handle_set.now_exp,
-               needed_exp=handle_set.needed_exp,
+               rate=handle_set.rate,
+               now_rate=handle_set.now_rate,
+               needed_rate=handle_set.needed_rate,
                percentage=handle_set.percentage,
                bar_size=handle_set.bar_size)
 
