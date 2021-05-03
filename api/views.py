@@ -31,6 +31,18 @@ BACKGROUND_COLOR = {
     'Master': ['#83f8fe', '#b297fc', '#fc7ea8'],
 }
 
+BACKGROUND_COLOR_PASTEL = {
+    'Unknown': ['#eeeeee', '#dadada'],
+    'Unrated': ['#dddddd', '#aaaaaa'],
+    'Bronze': ['rgb(197, 164, 143)', 'rgb(222, 176, 132)'],
+    'Silver': ['rgb(225, 204, 204)', 'rgb(182, 178, 177)'],
+    'Gold': ['rgb(265, 237, 150)', 'rgb(255, 190, 138)'],
+    'Platinum': ['rgb(180, 247, 249)', 'rgb(200, 260, 218)'],
+    'Diamond': ['rgb(195, 236, 249)', 'rgb(187, 202, 250)'],
+    'Ruby': ['rgb(253, 205, 185)', 'rgb(255, 130, 155)'],
+    'Master': ['rgb(196, 254, 255)', 'rgb(255, 210, 234)'],
+}
+
 TIER_IMG_LINK = {
     'Unknown': UNKNOWN,
     'Unrated': UNRATED,
@@ -165,7 +177,7 @@ def generate_badge(request):
                     opacity: 1;
                 }}
             }}
-            @keyframes expBarAnimation {{
+            @keyframes rateBarAnimation {{
                 0% {{
                     stroke-dashoffset: {bar_size};
                 }}
@@ -216,10 +228,10 @@ def generate_badge(request):
                 opacity: 0;
                 animation: delayFadeIn 1s ease-in-out forwards;
             }}
-            .exp-bar {{
+            .rate-bar {{
                 stroke-dasharray: {bar_size};
                 stroke-dashoffset: {bar_size};
-                animation: expBarAnimation 1.5s forwards ease-in-out;
+                animation: rateBarAnimation 1.5s forwards ease-in-out;
             }}
         ]]>
     </style>
@@ -306,7 +318,7 @@ def generate_badge_v2(request):
                     opacity:1
                 }}
             }}
-            @keyframes expBarAnimation {{
+            @keyframes rateBarAnimation {{
                 0% {{
                     stroke-dashoffset: {bar_size};
                 }}
@@ -360,10 +372,10 @@ def generate_badge_v2(request):
                 opacity: 0;
                 animation: delayFadeIn 2s ease-in-out forwards;
             }}
-            .exp-bar {{
+            .rate-bar {{
                 stroke-dasharray: {bar_size};
                 stroke-dashoffset: {bar_size};
-                animation: expBarAnimation 1.5s forwards ease-in-out;
+                animation: rateBarAnimation 1.5s forwards ease-in-out;
             }}
             .tier-title {{
                 animation: delayFadeIn 2s ease-in-out forwards;
@@ -495,7 +507,7 @@ def generate_badge_mini(request):
                     opacity: 1;
                 }}
             }}
-            @keyframes expBarAnimation {{
+            @keyframes rateBarAnimation {{
                 from {{
                     stroke-dashoffset: {bar_size};
                 }}
@@ -545,6 +557,149 @@ def generate_badge_mini(request):
                tier_title=handle_set.tier_title[0],
                solved=handle_set.solved,
                boj_class=handle_set.boj_class,
+               rate=handle_set.rate,
+               now_rate=handle_set.now_rate,
+               needed_rate=handle_set.needed_rate,
+               percentage=handle_set.percentage,
+               bar_size=handle_set.bar_size)
+
+    response = HttpResponse(content=svg)
+    response['Content-Type'] = 'image/svg+xml'
+    response['Cache-Control'] = 'no-cache'
+
+    return response
+
+
+def generate_badge_pastel(request):
+    MAX_LEN = 11
+    url_set = UrlSettings(request, MAX_LEN)
+    handle_set = BojDefaultSettings(request, url_set)
+
+    svg = '''
+    <!DOCTYPE svg PUBLIC
+        "-//W3C//DTD SVG 1.1//EN"
+        "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg height="170" width="350"
+    version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xml:space="preserve">
+    <style type="text/css">
+        <![CDATA[
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=block');
+            @keyframes delayFadeIn {{
+                0%{{
+                    opacity:0
+                }}
+                60%{{
+                    opacity:0
+                }}
+                100%{{
+                    opacity:1
+                }}
+            }}
+            @keyframes fadeIn {{
+                from {{
+                    opacity: 0;
+                }}
+                to {{
+                    opacity: 1;
+                }}
+            }}
+            @keyframes rateBarAnimation {{
+                0% {{
+                    stroke-dashoffset: {bar_size};
+                }}
+                70% {{
+                    stroke-dashoffset: {bar_size};
+                }}
+                100%{{
+                    stroke-dashoffset: 35;
+                }}
+            }}
+            .background {{
+                fill: url(#grad);
+            }}
+            text {{
+                fill: #555555;
+                font-family: 'Noto Sans KR', sans-serif;
+                opacity: 80%;
+            }}
+            text.boj-handle {{
+                font-weight: 700;
+                font-size: 1.45em;
+                opacity: 75%;
+                animation: fadeIn 0.8s ease-in-out forwards;
+            }}
+            text.tier-text {{
+                font-weight: 700;
+                font-size: 1.45em;
+                opacity: 55%;
+            }}
+            text.tier-number {{
+                font-size: 3.1em;
+                font-weight: 700;
+            }}
+            .subtitle {{
+                font-weight: 500;
+                font-size: 0.9em;
+            }}
+            .value {{
+                font-weight: 400;
+                font-size: 0.9em;
+            }}
+            .percentage {{
+                font-weight: 300;
+                font-size: 0.8em;
+            }}
+            .progress {{
+                font-size: 0.7em;
+            }}
+            .item {{
+                opacity: 0;
+                animation: delayFadeIn 1s ease-in-out forwards;
+            }}
+            .rate-bar {{
+                stroke-dasharray: {bar_size};
+                stroke-dashoffset: {bar_size};
+                animation: rateBarAnimation 1.5s forwards ease-in-out;
+            }}
+        ]]>
+    </style>
+    <defs>
+        <linearGradient id="linear-gradient" x1="0.066" y1="-0.15" x2="0.93" y2="0.925" gradientUnits="objectBoundingBox">
+        <stop offset="0" stop-color="{color1}"/>
+        <stop offset="1" stop-color="{color2}"/>
+        </linearGradient>
+    </defs>
+    <rect id="사각형_2" data-name="사각형 2" width="350" height="170" rx="13" opacity="1" fill="url(#linear-gradient)"/>
+
+    <text x="315" y="50" class="tier-text" text-anchor="end" >{tier_title}{tier_rank}</text>
+    <text x="35" y="50" class="boj-handle">{boj_handle}</text>
+    <g class="item" style="animation-delay: 200ms">
+        <text x="35" y="79" class="subtitle">rate</text><text x="145" y="79" class="rate value">{rate}</text>
+    </g>
+    <g class="item" style="animation-delay: 400ms">
+        <text x="35" y="99" class="subtitle">solved</text><text x="145" y="99" class="solved value">{solved}</text>
+    </g>
+    <g class="item" style="animation-delay: 600ms">
+        <text x="35" y="119" class="subtitle">class</text><text x="145" y="119" class="class value">{boj_class}{boj_class_decoration}</text>
+    </g>
+    <line x1="35" y1="142" x2="290" y2="142" stroke-width="4" stroke-opacity="65%" stroke="floralwhite" stroke-linecap="round"/>
+    <g class="rate-bar" style="animation-delay: 800ms">
+        <line x1="35" y1="142" x2="{bar_size}" y2="142" stroke-width="4" stroke="#333333" stroke-linecap="round" stroke-opacity="60%"/>
+    </g>
+    <text x="297" y="142" alignment-baseline="middle" class="percentage">{percentage}%</text>
+    <text x="293" y="157" class="progress" text-anchor="end">{now_rate} / {needed_rate}</text>
+</svg>
+    '''.format(color1=BACKGROUND_COLOR_PASTEL[handle_set.tier_title][0],
+               color2=BACKGROUND_COLOR_PASTEL[handle_set.tier_title][1],
+               boj_handle=url_set.boj_name,
+               tier_rank=handle_set.tier_rank,
+               tier_title=handle_set.tier_title,
+               solved=handle_set.solved,
+               boj_class=handle_set.boj_class,
+               boj_class_decoration=handle_set.boj_class_decoration,
                rate=handle_set.rate,
                now_rate=handle_set.now_rate,
                needed_rate=handle_set.needed_rate,
