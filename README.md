@@ -96,6 +96,14 @@ python manage.py runserver # 서버 실행
 <img src="https://i.ibb.co/Vg2NcZH/chrome-VBCSLd8v-HF.png" alt="chrome-VBCSLd8v-HF" border="0">
 
 
+## Mazassumnida Pastel
+
+### Usage
+
+```html
+[![Solved.ac
+프로필](http://mazassumnida.wtf/api/pastel/generate_badge?boj={handle})](https://solved.ac/{handle})
+```
 
 ## Mazassumnida v.mini
 
