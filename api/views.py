@@ -75,22 +75,21 @@ class UrlSettings(object):
         else:
             self.boj_name = self.boj_handle
         self.user_information_url = self.api_server + \
-            '/v2/users/show.json?id=' + self.boj_handle
+            '/v3/user/show?handle=' + self.boj_handle
 
 
 class BojDefaultSettings(object):
     def __init__(self, request, url_set):
         try:
             self.json = requests.get(url_set.user_information_url).json()
-            self.json = self.json["result"]['user'][0]
             self.rating = self.json['rating']
             self.level = self.boj_rating_to_lv(self.json['rating'])
-            self.solved = '{0:n}'.format(self.json['solved'])
+            self.solved = '{0:n}'.format(self.json['solvedCount'])
             self.boj_class = self.json['class']
             self.boj_class_decoration = ''
-            if self.json['class_decoration'] == 1:
+            if self.json['classDecoration'] == 1:
                 self.boj_class_decoration = '+'
-            elif self.json['class_decoration'] == 2:
+            elif self.json['classDecoration'] == 2:
                 self.boj_class_decoration = '++'
 
             self.my_rate = self.json['rating']
@@ -145,7 +144,7 @@ def generate_badge(request):
     MAX_LEN = 11
     url_set = UrlSettings(request, MAX_LEN)
     handle_set = BojDefaultSettings(request, url_set)
-
+    print(handle_set)
     svg = '''
     <!DOCTYPE svg PUBLIC
         "-//W3C//DTD SVG 1.1//EN"
