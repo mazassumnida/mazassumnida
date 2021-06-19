@@ -87,9 +87,9 @@ class BojDefaultSettings(object):
             self.solved = '{0:n}'.format(self.json['solvedCount'])
             self.boj_class = self.json['class']
             self.boj_class_decoration = ''
-            if self.json['classDecoration'] == 1:
+            if self.json['classDecoration'] == 'silver':
                 self.boj_class_decoration = '+'
-            elif self.json['classDecoration'] == 2:
+            elif self.json['classDecoration'] == 'gold':
                 self.boj_class_decoration = '++'
 
             self.my_rate = self.json['rating']
