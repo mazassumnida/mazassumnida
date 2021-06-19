@@ -144,7 +144,6 @@ def generate_badge(request):
     MAX_LEN = 11
     url_set = UrlSettings(request, MAX_LEN)
     handle_set = BojDefaultSettings(request, url_set)
-    print(handle_set)
     svg = '''
     <!DOCTYPE svg PUBLIC
         "-//W3C//DTD SVG 1.1//EN"
