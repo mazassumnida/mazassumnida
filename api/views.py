@@ -276,7 +276,7 @@ def generate_badge(request):
 
     response = HttpResponse(content=svg)
     response['Content-Type'] = 'image/svg+xml'
-    response['Cache-Control'] = 'no-cache'
+    response['Cache-Control'] = 'max-age=3600'
 
     return response
 
@@ -475,7 +475,7 @@ def generate_badge_v2(request):
 
     response = HttpResponse(content=svg)
     response['Content-Type'] = 'image/svg+xml'
-    response['Cache-Control'] = 'no-cache'
+    response['Cache-Control'] = 'max-age=3600'
 
     return response
 
@@ -563,7 +563,7 @@ def generate_badge_mini(request):
 
     response = HttpResponse(content=svg)
     response['Content-Type'] = 'image/svg+xml'
-    response['Cache-Control'] = 'no-cache'
+    response['Cache-Control'] = 'max-age=86400'
 
     return response
 
@@ -706,6 +706,6 @@ def generate_badge_pastel(request):
 
     response = HttpResponse(content=svg)
     response['Content-Type'] = 'image/svg+xml'
-    response['Cache-Control'] = 'no-cache'
+    response['Cache-Control'] = 'max-age=3600'
 
     return response
