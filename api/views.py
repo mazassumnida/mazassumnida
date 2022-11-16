@@ -1,11 +1,16 @@
 import os
 import requests
 import locale
+import logging
+from json import JSONDecodeError
 
 from django.http import HttpResponse
 from .images import UNKNOWN, UNRATED, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND, RUBY, MASTER
 
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+
+logger = logging.getLogger('testlogger')
+logger.info('Server Started...')
 
 # Create your views here.
 TIERS = (
@@ -68,7 +73,7 @@ TIER_RATES = (
 
 class UrlSettings(object):
     def __init__(self, request, MAX_LEN):
-        self.api_server = os.environ['API_SERVER']
+        self.api_server = 'https://solved.ac/api'
         self.boj_handle = request.GET.get("boj", "ccoco")
         if len(self.boj_handle) > MAX_LEN:
             self.boj_name = self.boj_handle[:(MAX_LEN - 2)] + "..."
@@ -113,7 +118,7 @@ class BojDefaultSettings(object):
                 self.tier_rank = ''
             else:
                 self.tier_title, self.tier_rank = TIERS[self.level].split()
-        except KeyError:
+        except JSONDecodeError as e:
             self.tier_title = "Unknown"
             url_set.boj_handle = 'Unknown'
             self.tier_rank = ''
