@@ -10,7 +10,6 @@ from .images import UNKNOWN, UNRATED, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND, R
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
 logger = logging.getLogger('testlogger')
-logger.info('Server Started...')
 
 # Create your views here.
 TIERS = (
@@ -119,6 +118,7 @@ class BojDefaultSettings(object):
             else:
                 self.tier_title, self.tier_rank = TIERS[self.level].split()
         except JSONDecodeError as e:
+            logger.error(e)
             self.tier_title = "Unknown"
             url_set.boj_handle = 'Unknown'
             self.tier_rank = ''
@@ -279,6 +279,7 @@ def generate_badge(request):
                percentage=handle_set.percentage,
                bar_size=handle_set.bar_size)
 
+    logger.info('[/generate_badge] user: {}, tier: {}'.format(url_set.boj_name, handle_set.tier_title))
     response = HttpResponse(content=svg)
     response['Content-Type'] = 'image/svg+xml'
     response['Cache-Control'] = 'max-age=3600'
@@ -478,6 +479,7 @@ def generate_badge_v2(request):
                percentage=handle_set.percentage,
                bar_size=handle_set.bar_size)
 
+    logger.info('[/generate_badge/v2] user: {}, tier: {}'.format(url_set.boj_name, handle_set.tier_title))
     response = HttpResponse(content=svg)
     response['Content-Type'] = 'image/svg+xml'
     response['Cache-Control'] = 'max-age=3600'
@@ -565,7 +567,7 @@ def generate_badge_mini(request):
                needed_rate=handle_set.needed_rate,
                percentage=handle_set.percentage,
                bar_size=handle_set.bar_size)
-
+    logger.info('[/generate_badge/mini ] user: {}, tier: {}'.format(url_set.boj_name, handle_set.tier_title))
     response = HttpResponse(content=svg)
     response['Content-Type'] = 'image/svg+xml'
     response['Cache-Control'] = 'max-age=86400'
@@ -709,6 +711,7 @@ def generate_badge_pastel(request):
                percentage=handle_set.percentage,
                bar_size=handle_set.bar_size)
 
+    logger.info('[/generate_badge/pastel] user: {}, tier: {}'.format(url_set.boj_name, handle_set.tier_title))
     response = HttpResponse(content=svg)
     response['Content-Type'] = 'image/svg+xml'
     response['Cache-Control'] = 'max-age=3600'
