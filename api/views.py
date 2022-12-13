@@ -549,8 +549,8 @@ def generate_badge_mini(request):
     </defs>
     <rect width="40" height="20" x="70" y="0" rx="3" ry="3" class="background"/>
     <rect width="75" height="20" clip-path="url(#round-corner)" class="gray-area"/>
-    <text text-anchor="middle" alignment-baseline="middle" transform="translate(37.5, 11)">solved.ac</text>
-    <text class="tier" text-anchor="middle" alignment-baseline="middle" transform="translate(92, 11)">{tier_title}{tier_rank}</text>
+    <text text-anchor="middle" alignment-baseline="middle" dominant-baseline="middle" transform="translate(37.5, 11)">solved.ac</text>
+    <text class="tier" text-anchor="middle" alignment-baseline="middle" dominant-baseline="middle" transform="translate(92, 11)">{tier_title}{tier_rank}</text>
 
 
 </svg>
