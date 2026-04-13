@@ -1,5 +1,5 @@
 import os
-import requests
+from curl_cffi import requests as curl_requests
 import locale
 import logging
 from json import JSONDecodeError
@@ -85,7 +85,19 @@ class UrlSettings(object):
 class BojDefaultSettings(object):
     def __init__(self, request, url_set):
         try:
-            self.json = requests.get(url_set.user_information_url).json()
+            # Use curl_cffi to impersonate a real browser (Chrome)
+            response = curl_requests.get(
+                url_set.user_information_url,
+                impersonate="chrome110",
+                timeout=10
+            )
+            
+            logger.info(f"Solved.ac API Status: {response.status_code}")
+            
+            if response.status_code != 200:
+                logger.error(f"Solved.ac API Error Content: {response.text[:500]}")
+            
+            self.json = response.json()
             self.rating = self.json['rating']
             self.level = self.boj_rating_to_lv(self.json['rating'])
             self.solved = '{0:n}'.format(self.json['solvedCount'])
