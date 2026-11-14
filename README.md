@@ -8,30 +8,41 @@ Github 프로필에서 boj 프로필을 이쁘게 보여주는 프로젝트
 - 만약 로드된 후 애니메이션을 다시 보고싶으시면 `ctrl + shift + R` 을 눌러서 강력 새로고침을 하시면 다시 보실 수 있습니다!
 
 [![Solved.ac
-프로필](http://mazassumnida.wtf/api/mini/generate_badge?boj=koosaga)](https://github.com/mazassumnida/mazassumnida)
+프로필](https://mazassumnida.wtf/api/mini/generate_badge?boj=koosaga)](https://github.com/mazassumnida/mazassumnida)
 
 [![Solved.ac
-프로필](http://mazassumnida.wtf/api/v2/generate_badge?boj=Malkoring)](https://solved.ac/malkoring)
+프로필](https://mazassumnida.wtf/api/v2/generate_badge?boj=Malkoring)](https://solved.ac/malkoring)
 [![Solved.ac
-프로필](http://mazassumnida.wtf/api/generate_badge?boj=ccoco&c=c)](https://solved.ac/ccoco)
+프로필](https://mazassumnida.wtf/api/generate_badge?boj=ccoco&c=c)](https://solved.ac/ccoco)
 [![Solved.ac
-프로필](http://mazassumnida.wtf/api/v2/generate_badge?boj=strawJI)](https://solved.ac/strawji)
+프로필](https://mazassumnida.wtf/api/v2/generate_badge?boj=strawJI)](https://solved.ac/strawji)
 
 
 ## install
 
+Python 3.12를 사용합니다. 로컬 개발용 서명 키는 서버를 실행할 셸에서 생성하세요.
+
+```sh
+export DJANGO_SECRET_KEY="$(python3 -c 'import secrets; print(secrets.token_urlsafe(64))')"
+```
+
+운영 환경에서는 새로 생성한 키를 배포 플랫폼의 비밀 설정에 한 번 저장하고 모든 워커와 재시작에서 같은 값을 사용하세요. Git 기록에 있던 키는 폐기하고 폴백 키로도 등록하지 마세요. 기존 키로 서명한 값은 교체 후 검증에 실패할 수 있습니다.
+
+기본 허용 호스트는 `mazassumnida.wtf`와 로컬 주소입니다. 다른 도메인으로 서비스하면 `DJANGO_ALLOWED_HOSTS`에 사용할 호스트 전체를 쉼표로 구분해 지정하세요. 디버그 모드가 필요한 로컬 개발에서만 `DJANGO_DEBUG=1`을 설정하세요.
+
+HTTPS를 종료하는 프록시에서 HTTP 리디렉션과 HSTS를 설정할 수 있습니다. Django가 직접 처리할 경우 HTTPS 요청을 `request.is_secure()`가 올바르게 인식하는지 먼저 확인한 뒤 `DJANGO_SECURE_SSL_REDIRECT=1`과 `DJANGO_SECURE_HSTS_SECONDS`(초)를 설정하세요.
+
 ### Poetry를 이용할 경우
 
 ```sh
-poetry install             # 의존성 설치
-poetry shell               # 가상환경에 진입
-python manage.py runserver # 서버 실행
+poetry install
+poetry run python manage.py runserver
 ```
 
 ### requirements.txt를 이용할 경우
 
 ```sh
-pip install -r requirements.txt
+python -m pip install --require-hashes -r requirements.txt
 python manage.py runserver # 서버 실행
 ```
 
@@ -41,7 +52,7 @@ python manage.py runserver # 서버 실행
 
 ```html
 [![Solved.ac
-프로필](http://mazassumnida.wtf/api/generate_badge?boj={handle})](https://solved.ac/{handle})
+프로필](https://mazassumnida.wtf/api/generate_badge?boj={handle})](https://solved.ac/{handle})
 ```
 
 ### Screenshots
@@ -72,7 +83,7 @@ python manage.py runserver # 서버 실행
 
 ```html
 [![Solved.ac
-프로필](http://mazassumnida.wtf/api/v2/generate_badge?boj={handle})](https://solved.ac/{handle})
+프로필](https://mazassumnida.wtf/api/v2/generate_badge?boj={handle})](https://solved.ac/{handle})
 ```
 
 ### Screenshots
@@ -102,7 +113,7 @@ python manage.py runserver # 서버 실행
 
 ```html
 [![Solved.ac
-프로필](http://mazassumnida.wtf/api/mini/generate_badge?boj={handle})](https://solved.ac/{handle})
+프로필](https://mazassumnida.wtf/api/mini/generate_badge?boj={handle})](https://solved.ac/{handle})
 ```
 
 ### Screenshots

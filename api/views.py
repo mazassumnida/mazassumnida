@@ -1,13 +1,18 @@
-import os
-from curl_cffi import requests as curl_requests
-import locale
+import json
 import logging
-from json import JSONDecodeError
+import re
+from html import escape
 
+from curl_cffi import CurlOpt, requests
+from curl_cffi.requests.exceptions import RequestException
+from django.core.exceptions import BadRequest
 from django.http import HttpResponse
+from django.views.decorators.http import require_safe
+
 from .images import UNKNOWN, UNRATED, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND, RUBY, MASTER
 
-locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+USER_API = 'https://solved.ac/api/v3/user/show'
+MAX_PROFILE_BYTES = 64 * 1024
 
 logger = logging.getLogger('testlogger')
 
@@ -72,67 +77,39 @@ TIER_RATES = (
 
 class UrlSettings(object):
     def __init__(self, request, MAX_LEN):
-        self.api_server = 'https://solved.ac/api'
         self.boj_handle = request.GET.get("boj", "ccoco")
+        if not re.fullmatch(r'[A-Za-z0-9_]{1,20}', self.boj_handle):
+            raise BadRequest('Invalid BOJ handle')
         if len(self.boj_handle) > MAX_LEN:
             self.boj_name = self.boj_handle[:(MAX_LEN - 2)] + "..."
         else:
             self.boj_name = self.boj_handle
-        self.user_information_url = self.api_server + \
-            '/v3/user/show?handle=' + self.boj_handle
+
+
+def fetch_profile(handle):
+    response = requests.get(
+        USER_API, params={'handle': handle}, impersonate='chrome110',
+        timeout=(2, 4), allow_redirects=False,
+        curl_options={CurlOpt.MAXFILESIZE_LARGE: MAX_PROFILE_BYTES},
+    )
+    if response.status_code != 200 or len(response.content) > MAX_PROFILE_BYTES:
+        raise ValueError('Invalid profile response')
+    profile = json.loads(response.content)
+    if not isinstance(profile, dict):
+        raise ValueError('Invalid profile')
+    for field in ('rating', 'solvedCount', 'class'):
+        value = profile.get(field)
+        if type(value) is not int or value < 0:
+            raise ValueError('Invalid numeric profile field')
+    return profile
 
 
 class BojDefaultSettings(object):
-    def __init__(self, request, url_set):
+    def __init__(self, url_set):
         try:
-            # Use curl_cffi to impersonate a real browser (Chrome)
-            response = curl_requests.get(
-                url_set.user_information_url,
-                impersonate="chrome110",
-                timeout=10
-            )
-            
-            logger.info(f"Solved.ac API Status: {response.status_code}")
-            
-            if response.status_code != 200:
-                logger.error(f"Solved.ac API Error Content: {response.text[:500]}")
-            
-            self.json = response.json()
-            self.rating = self.json['rating']
-            self.level = self.boj_rating_to_lv(self.json['rating'])
-            self.solved = '{0:n}'.format(self.json['solvedCount'])
-            self.boj_class = self.json['class']
-            self.boj_class_decoration = ''
-            if self.json['classDecoration'] == 'silver':
-                self.boj_class_decoration = '+'
-            elif self.json['classDecoration'] == 'gold':
-                self.boj_class_decoration = '++'
-
-            self.my_rate = self.json['rating']
-            if self.level == 31:
-                self.prev_rate = TIER_RATES[self.level]
-                self.next_rate = TIER_RATES[self.level]
-                self.percentage = 100
-            else:
-                self.prev_rate = TIER_RATES[self.level]
-                self.next_rate = TIER_RATES[self.level+1]
-                self.percentage = round(
-                    (self.my_rate - self.prev_rate) * 100 / (self.next_rate - self.prev_rate))
-            self.bar_size = 35 + 2.55 * self.percentage
-
-            self.needed_rate = '{0:n}'.format(self.next_rate)
-            self.now_rate = '{0:n}'.format(self.my_rate)
-            self.rate = '{0:n}'.format(self.my_rate)
-
-            if TIERS[self.level] == 'Unrated' or TIERS[self.level] == 'Master':
-                self.tier_title = TIERS[self.level]
-                self.tier_rank = ''
-            else:
-                self.tier_title, self.tier_rank = TIERS[self.level].split()
-        except JSONDecodeError as e:
-            logger.error(e)
+            profile = fetch_profile(url_set.boj_handle)
+        except (RequestException, ValueError, RecursionError):
             self.tier_title = "Unknown"
-            url_set.boj_handle = 'Unknown'
             self.tier_rank = ''
             self.solved = '0'
             self.boj_class = '0'
@@ -142,6 +119,38 @@ class BojDefaultSettings(object):
             self.needed_rate = '0'
             self.percentage = '0'
             self.bar_size = '35'
+            return
+
+        self.level = self.boj_rating_to_lv(profile['rating'])
+        self.solved = format(profile['solvedCount'], ',')
+        self.boj_class = profile['class']
+        self.boj_class_decoration = ''
+        if profile.get('classDecoration') == 'silver':
+            self.boj_class_decoration = '+'
+        elif profile.get('classDecoration') == 'gold':
+            self.boj_class_decoration = '++'
+
+        self.my_rate = profile['rating']
+        if self.level == 31:
+            self.prev_rate = TIER_RATES[self.level]
+            self.next_rate = TIER_RATES[self.level]
+            self.percentage = 100
+        else:
+            self.prev_rate = TIER_RATES[self.level]
+            self.next_rate = TIER_RATES[self.level+1]
+            self.percentage = round(
+                (self.my_rate - self.prev_rate) * 100 / (self.next_rate - self.prev_rate))
+        self.bar_size = 35 + 2.55 * self.percentage
+
+        self.needed_rate = format(self.next_rate, ',')
+        self.now_rate = format(self.my_rate, ',')
+        self.rate = format(self.my_rate, ',')
+
+        if TIERS[self.level] == 'Unrated' or TIERS[self.level] == 'Master':
+            self.tier_title = TIERS[self.level]
+            self.tier_rank = ''
+        else:
+            self.tier_title, self.tier_rank = TIERS[self.level].split()
 
     def boj_rating_to_lv(self, rating):
         if rating < 30: return 0
@@ -157,14 +166,22 @@ class BojDefaultSettings(object):
         return 31
 
 
+def badge_response(svg, tier, max_age=3600):
+    response = HttpResponse(svg, content_type='image/svg+xml')
+    response['Content-Security-Policy'] = (
+        "default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; "
+        "font-src https://fonts.gstatic.com; img-src data:; base-uri 'none'; form-action 'none'"
+    )
+    response['Cache-Control'] = 'no-store' if tier == 'Unknown' else f'max-age={max_age}'
+    return response
+
+
+@require_safe
 def generate_badge(request):
     MAX_LEN = 11
     url_set = UrlSettings(request, MAX_LEN)
-    handle_set = BojDefaultSettings(request, url_set)
+    handle_set = BojDefaultSettings(url_set)
     svg = '''
-    <!DOCTYPE svg PUBLIC
-        "-//W3C//DTD SVG 1.1//EN"
-        "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg height="170" width="350"
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
@@ -279,7 +296,7 @@ def generate_badge(request):
     '''.format(color1=BACKGROUND_COLOR[handle_set.tier_title][0],
                color2=BACKGROUND_COLOR[handle_set.tier_title][1],
                color3=BACKGROUND_COLOR[handle_set.tier_title][2],
-               boj_handle=url_set.boj_name,
+               boj_handle=escape(url_set.boj_name),
                tier_rank=handle_set.tier_rank,
                tier_title=handle_set.tier_title,
                solved=handle_set.solved,
@@ -292,21 +309,15 @@ def generate_badge(request):
                bar_size=handle_set.bar_size)
 
     logger.info('[/generate_badge] user: {}, tier: {}'.format(url_set.boj_name, handle_set.tier_title))
-    response = HttpResponse(content=svg)
-    response['Content-Type'] = 'image/svg+xml'
-    response['Cache-Control'] = 'max-age=3600'
-
-    return response
+    return badge_response(svg, handle_set.tier_title)
 
 
+@require_safe
 def generate_badge_v2(request):
     MAX_LEN = 15
     url_set = UrlSettings(request, MAX_LEN)
-    handle_set = BojDefaultSettings(request, url_set)
+    handle_set = BojDefaultSettings(url_set)
     svg = '''
-    <!DOCTYPE svg PUBLIC
-        "-//W3C//DTD SVG 1.1//EN"
-        "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg height="170" width="350"
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
@@ -479,7 +490,7 @@ def generate_badge_v2(request):
     '''.format(color1=BACKGROUND_COLOR[handle_set.tier_title][0],
                color2=BACKGROUND_COLOR[handle_set.tier_title][1],
                color3=BACKGROUND_COLOR[handle_set.tier_title][2],
-               boj_handle=url_set.boj_name,
+               boj_handle=escape(url_set.boj_name),
                tier_rank=('M' if handle_set.tier_title == 'Master' else handle_set.tier_rank),
                tier_img_link=TIER_IMG_LINK[handle_set.tier_title],
                solved=handle_set.solved,
@@ -492,21 +503,15 @@ def generate_badge_v2(request):
                bar_size=handle_set.bar_size)
 
     logger.info('[/generate_badge/v2] user: {}, tier: {}'.format(url_set.boj_name, handle_set.tier_title))
-    response = HttpResponse(content=svg)
-    response['Content-Type'] = 'image/svg+xml'
-    response['Cache-Control'] = 'max-age=3600'
+    return badge_response(svg, handle_set.tier_title)
 
-    return response
-
+@require_safe
 def generate_badge_mini(request):
     MAX_LEN = 11
     url_set = UrlSettings(request, MAX_LEN)
-    handle_set = BojDefaultSettings(request, url_set)
+    handle_set = BojDefaultSettings(url_set)
 
     svg = '''
-    <!DOCTYPE svg PUBLIC
-        "-//W3C//DTD SVG 1.1//EN"
-        "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg height="20" width="110"
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
@@ -569,7 +574,7 @@ def generate_badge_mini(request):
     '''.format(color1=BACKGROUND_COLOR[handle_set.tier_title][0],
                color2=BACKGROUND_COLOR[handle_set.tier_title][1],
                color3=BACKGROUND_COLOR[handle_set.tier_title][2],
-               boj_handle=url_set.boj_name,
+               boj_handle=escape(url_set.boj_name),
                tier_rank=handle_set.tier_rank,
                tier_title=handle_set.tier_title[0],
                solved=handle_set.solved,
@@ -580,22 +585,16 @@ def generate_badge_mini(request):
                percentage=handle_set.percentage,
                bar_size=handle_set.bar_size)
     logger.info('[/generate_badge/mini ] user: {}, tier: {}'.format(url_set.boj_name, handle_set.tier_title))
-    response = HttpResponse(content=svg)
-    response['Content-Type'] = 'image/svg+xml'
-    response['Cache-Control'] = 'max-age=86400'
-
-    return response
+    return badge_response(svg, handle_set.tier_title, max_age=86400)
 
 
+@require_safe
 def generate_badge_pastel(request):
     MAX_LEN = 11
     url_set = UrlSettings(request, MAX_LEN)
-    handle_set = BojDefaultSettings(request, url_set)
+    handle_set = BojDefaultSettings(url_set)
 
     svg = '''
-    <!DOCTYPE svg PUBLIC
-        "-//W3C//DTD SVG 1.1//EN"
-        "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg height="170" width="350"
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
@@ -711,7 +710,7 @@ def generate_badge_pastel(request):
 </svg>
     '''.format(color1=BACKGROUND_COLOR_PASTEL[handle_set.tier_title][0],
                color2=BACKGROUND_COLOR_PASTEL[handle_set.tier_title][1],
-               boj_handle=url_set.boj_name,
+               boj_handle=escape(url_set.boj_name),
                tier_rank=handle_set.tier_rank,
                tier_title=handle_set.tier_title,
                solved=handle_set.solved,
@@ -724,8 +723,4 @@ def generate_badge_pastel(request):
                bar_size=handle_set.bar_size)
 
     logger.info('[/generate_badge/pastel] user: {}, tier: {}'.format(url_set.boj_name, handle_set.tier_title))
-    response = HttpResponse(content=svg)
-    response['Content-Type'] = 'image/svg+xml'
-    response['Cache-Control'] = 'max-age=3600'
-
-    return response
+    return badge_response(svg, handle_set.tier_title)
