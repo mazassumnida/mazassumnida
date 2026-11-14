@@ -10,9 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
+import mimetypes
 import os
 
-import mimetypes
+from django.core.exceptions import ImproperlyConfigured
 
 mimetypes.add_type("image/svg+xml", ".svg", True)
 mimetypes.add_type("image/svg+xml", ".svgz", True)
@@ -21,16 +22,23 @@ mimetypes.add_type("image/svg+xml", ".svgz", True)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+if not SECRET_KEY or not SECRET_KEY.strip():
+    raise ImproperlyConfigured('Set DJANGO_SECRET_KEY before starting the application.')
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'w$xeq@dv_-43$d2ho!t4_e6#xnn237dtj1_@&pfj5z4sv%dfnm'
+DEBUG = os.environ.get('DJANGO_DEBUG') == '1'
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get(
+        'DJANGO_ALLOWED_HOSTS', 'mazassumnida.wtf,localhost,127.0.0.1,[::1]'
+    ).split(',')
+    if host.strip()
+]
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-
-ALLOWED_HOSTS = ['.herokuapp.com', '.ngrok.io', 'localhost', 'github.com', 'mazassumnida.wtf', '127.0.0.1']
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_SSL_REDIRECT = os.environ.get('DJANGO_SECURE_SSL_REDIRECT') == '1'
+SECURE_HSTS_SECONDS = int(os.environ.get('DJANGO_SECURE_HSTS_SECONDS', '0'))
 
 # Application definition
 
