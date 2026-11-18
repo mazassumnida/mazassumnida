@@ -146,6 +146,9 @@ gunicorn==27.0.1 ; python_version >= "3.12" and python_version < "4.0" \
 pycparser==3.12 ; python_version >= "3.12" and python_version < "4.0" and implementation_name != "PyPy" \
     --hash=sha256:a076f3f489b39b43ed13563a1dafe42447445bec2e294154ec5c57fcdda4c85e \
     --hash=sha256:f03387877eab82ce01bbdfd0ba7252ee55a90b1c708d5129e2ce915475cf1db6
+redis==7.4.1 ; python_version >= "3.12" and python_version < "4.0" \
+    --hash=sha256:1a1df5067062cf7cbe677994e391f8ee0840f499d370f1a71266e0dd3aa9308e \
+    --hash=sha256:1fa4647af1c5e93a2c685aa248ee44cce092691146d41390518dabe9a99839b0
 sqlparse==0.6.1 ; python_version >= "3.12" and python_version < "4.0" \
     --hash=sha256:3be5a72d04c873d690d7c6dedd33d6fae2ef82759881ceec02fc2efd0cba564f \
     --hash=sha256:ca722573f848ff2d30e40ea30f53a104b7dea7635ea9285891263eb2c58fb6e7

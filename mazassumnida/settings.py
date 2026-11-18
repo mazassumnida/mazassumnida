@@ -40,6 +40,27 @@ CSRF_COOKIE_SECURE = not DEBUG
 SECURE_SSL_REDIRECT = os.environ.get('DJANGO_SECURE_SSL_REDIRECT') == '1'
 SECURE_HSTS_SECONDS = int(os.environ.get('DJANGO_SECURE_HSTS_SECONDS', '0'))
 
+SOLVED_AC_CLIENT_ID = os.environ.get('SOLVED_AC_CLIENT_ID', '')
+SOLVED_AC_CLIENT_SECRET = os.environ.get('SOLVED_AC_CLIENT_SECRET', '')
+
+# Local memory is for development or a single worker. REDIS_URL enables shared
+# profile caching, refresh leases, and rate limiting across production workers.
+redis_url = os.environ.get('REDIS_URL')
+CACHES = {
+    'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'},
+    'solved_ac': {
+        'BACKEND': 'api.cache.ProfileMemoryCache',
+        'LOCATION': 'solved-ac-v4',
+        'OPTIONS': {'MAX_ENTRIES': 10000},
+    },
+}
+if redis_url:
+    CACHES['solved_ac'] = {
+        'BACKEND': 'api.cache.ProfileRedisCache',
+        'LOCATION': redis_url,
+        'OPTIONS': {'socket_connect_timeout': 2, 'socket_timeout': 2},
+    }
+
 # Application definition
 
 INSTALLED_APPS = [
