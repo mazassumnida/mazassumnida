@@ -1,18 +1,14 @@
-import json
 import logging
 import re
 from html import escape
 
-from curl_cffi import CurlOpt, requests
-from curl_cffi.requests.exceptions import RequestException
 from django.core.exceptions import BadRequest
 from django.http import HttpResponse
 from django.views.decorators.http import require_safe
 
 from .images import UNKNOWN, UNRATED, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND, RUBY, MASTER
 
-USER_API = 'https://solved.ac/api/v3/user/show'
-MAX_PROFILE_BYTES = 64 * 1024
+from .solvedac import ProfileUnavailable, fetch_profile
 
 logger = logging.getLogger('testlogger')
 
@@ -77,38 +73,23 @@ TIER_RATES = (
 
 class UrlSettings(object):
     def __init__(self, request, MAX_LEN):
-        self.boj_handle = request.GET.get("boj", "ccoco")
-        if not re.fullmatch(r'[A-Za-z0-9_]{1,20}', self.boj_handle):
-            raise BadRequest('Invalid BOJ handle')
+        self.boj_handle = request.GET.get("handle", request.GET.get("boj", "ccoco"))
+        if (not 1 <= len(self.boj_handle) <= 64 or self.boj_handle in ('.', '..')
+                or re.search(r'[\s\x00-\x1f\x7f-\x9f\ud800-\udfff\ufffe\uffff]', self.boj_handle)):
+            raise BadRequest('Invalid solved.ac handle')
         if len(self.boj_handle) > MAX_LEN:
             self.boj_name = self.boj_handle[:(MAX_LEN - 2)] + "..."
         else:
             self.boj_name = self.boj_handle
 
 
-def fetch_profile(handle):
-    response = requests.get(
-        USER_API, params={'handle': handle}, impersonate='chrome110',
-        timeout=(2, 4), allow_redirects=False,
-        curl_options={CurlOpt.MAXFILESIZE_LARGE: MAX_PROFILE_BYTES},
-    )
-    if response.status_code != 200 or len(response.content) > MAX_PROFILE_BYTES:
-        raise ValueError('Invalid profile response')
-    profile = json.loads(response.content)
-    if not isinstance(profile, dict):
-        raise ValueError('Invalid profile')
-    for field in ('rating', 'solvedCount', 'class'):
-        value = profile.get(field)
-        if type(value) is not int or value < 0:
-            raise ValueError('Invalid numeric profile field')
-    return profile
-
-
 class BojDefaultSettings(object):
     def __init__(self, url_set):
+        self.cacheable = False
+        self.profile_age = 0
         try:
-            profile = fetch_profile(url_set.boj_handle)
-        except (RequestException, ValueError, RecursionError):
+            result = fetch_profile(url_set.boj_handle)
+        except ProfileUnavailable:
             self.tier_title = "Unknown"
             self.tier_rank = ''
             self.solved = '0'
@@ -119,60 +100,59 @@ class BojDefaultSettings(object):
             self.needed_rate = '0'
             self.percentage = '0'
             self.bar_size = '35'
+            self.percentage_text = ''
+            self.progress_text = ''
             return
 
-        self.level = self.boj_rating_to_lv(profile['rating'])
+        profile = result.data
+        self.cacheable = not result.stale
+        self.profile_age = result.age
+        self.level = profile['tier']
         self.solved = format(profile['solvedCount'], ',')
         self.boj_class = profile['class']
-        self.boj_class_decoration = ''
-        if profile.get('classDecoration') == 'silver':
-            self.boj_class_decoration = '+'
-        elif profile.get('classDecoration') == 'gold':
-            self.boj_class_decoration = '++'
-
+        self.boj_class_decoration = '+' if profile['classPlus'] else ''
         self.my_rate = profile['rating']
-        if self.level == 31:
-            self.prev_rate = TIER_RATES[self.level]
-            self.next_rate = TIER_RATES[self.level]
+        self.now_rate = format(self.my_rate, ',')
+        self.rate = self.now_rate
+        self.percentage = 0
+        self.bar_size = 35
+        self.needed_rate = ''
+        self.percentage_text = ''
+        self.progress_text = ''
+        self.tier_rank = ''
+
+        if self.level is None:
+            self.tier_title = 'Unknown'
+            return
+        self.tier_title = TIERS[self.level]
+        if self.level not in (0, 31):
+            self.tier_title, self.tier_rank = self.tier_title.split()
+
+        self.prev_rate = TIER_RATES[self.level]
+        self.next_rate = TIER_RATES[min(self.level + 1, 31)]
+        if self.level == 31 and self.my_rate >= self.prev_rate:
             self.percentage = 100
-        else:
-            self.prev_rate = TIER_RATES[self.level]
-            self.next_rate = TIER_RATES[self.level+1]
+        elif self.prev_rate <= self.my_rate < self.next_rate:
             self.percentage = round(
                 (self.my_rate - self.prev_rate) * 100 / (self.next_rate - self.prev_rate))
-        self.bar_size = 35 + 2.55 * self.percentage
-
-        self.needed_rate = format(self.next_rate, ',')
-        self.now_rate = format(self.my_rate, ',')
-        self.rate = format(self.my_rate, ',')
-
-        if TIERS[self.level] == 'Unrated' or TIERS[self.level] == 'Master':
-            self.tier_title = TIERS[self.level]
-            self.tier_rank = ''
         else:
-            self.tier_title, self.tier_rank = TIERS[self.level].split()
-
-    def boj_rating_to_lv(self, rating):
-        if rating < 30: return 0
-        if rating < 150: return rating // 30
-        if rating < 200: return 5
-        if rating < 500: return (rating-200) // 100 + 6
-        if rating < 1400: return (rating-500) // 150 + 9
-        if rating < 1600: return 15
-        if rating < 1750: return 16
-        if rating < 1900: return 17
-        if rating < 2800: return (rating-1900) // 100 + 18
-        if rating < 3000: return (rating-2800) // 50 + 27
-        return 31
+            # Respect the API tier even when rating is hidden, restricted, or
+            # the service's thresholds have changed.
+            return
+        self.bar_size = 35 + 2.55 * self.percentage
+        self.needed_rate = format(self.next_rate, ',')
+        self.percentage_text = f'{self.percentage}%'
+        self.progress_text = f'{self.now_rate} / {self.needed_rate}'
 
 
-def badge_response(svg, tier, max_age=3600):
+def badge_response(svg, handle_set, max_age=3600):
     response = HttpResponse(svg, content_type='image/svg+xml')
     response['Content-Security-Policy'] = (
         "default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; "
         "font-src https://fonts.gstatic.com; img-src data:; base-uri 'none'; form-action 'none'"
     )
-    response['Cache-Control'] = 'no-store' if tier == 'Unknown' else f'max-age={max_age}'
+    remaining = max(0, max_age - handle_set.profile_age)
+    response['Cache-Control'] = f'max-age={remaining}' if handle_set.cacheable else 'no-store'
     return response
 
 
@@ -290,8 +270,8 @@ def generate_badge(request):
         <line x1="35" y1="142" x2="{bar_size}" y2="142" stroke-width="4" stroke="floralwhite" stroke-linecap="round"/>
     </g>
     <line x1="35" y1="142" x2="290" y2="142" stroke-width="4" stroke-opacity="40%" stroke="floralwhite" stroke-linecap="round"/>
-    <text x="297" y="142" alignment-baseline="middle" class="percentage">{percentage}%</text>
-    <text x="293" y="157" class="progress" text-anchor="end">{now_rate} / {needed_rate}</text>
+    <text x="297" y="142" alignment-baseline="middle" class="percentage">{percentage_text}</text>
+    <text x="293" y="157" class="progress" text-anchor="end">{progress_text}</text>
 </svg>
     '''.format(color1=BACKGROUND_COLOR[handle_set.tier_title][0],
                color2=BACKGROUND_COLOR[handle_set.tier_title][1],
@@ -305,11 +285,12 @@ def generate_badge(request):
                rate=handle_set.rate,
                now_rate=handle_set.now_rate,
                needed_rate=handle_set.needed_rate,
-               percentage=handle_set.percentage,
+               percentage_text=handle_set.percentage_text,
+               progress_text=handle_set.progress_text,
                bar_size=handle_set.bar_size)
 
     logger.info('[/generate_badge] user: {}, tier: {}'.format(url_set.boj_name, handle_set.tier_title))
-    return badge_response(svg, handle_set.tier_title)
+    return badge_response(svg, handle_set)
 
 
 @require_safe
@@ -484,8 +465,8 @@ def generate_badge_v2(request):
         <line x1="35" y1="142" x2="{bar_size}" y2="142" stroke-width="4" stroke="floralwhite" stroke-linecap="round"/>
     </g>
     <line x1="35" y1="142" x2="290" y2="142" stroke-width="4" stroke-opacity="40%" stroke="floralwhite" stroke-linecap="round"/>
-    <text x="297" y="142" alignment-baseline="middle" class="percentage">{percentage}%</text>
-    <text x="293" y="157" class="progress" text-anchor="end">{now_rate} / {needed_rate}</text>
+    <text x="297" y="142" alignment-baseline="middle" class="percentage">{percentage_text}</text>
+    <text x="293" y="157" class="progress" text-anchor="end">{progress_text}</text>
 </svg>
     '''.format(color1=BACKGROUND_COLOR[handle_set.tier_title][0],
                color2=BACKGROUND_COLOR[handle_set.tier_title][1],
@@ -499,11 +480,12 @@ def generate_badge_v2(request):
                rate=handle_set.rate,
                now_rate=handle_set.now_rate,
                needed_rate=handle_set.needed_rate,
-               percentage=handle_set.percentage,
+               percentage_text=handle_set.percentage_text,
+               progress_text=handle_set.progress_text,
                bar_size=handle_set.bar_size)
 
     logger.info('[/generate_badge/v2] user: {}, tier: {}'.format(url_set.boj_name, handle_set.tier_title))
-    return badge_response(svg, handle_set.tier_title)
+    return badge_response(svg, handle_set)
 
 @require_safe
 def generate_badge_mini(request):
@@ -582,10 +564,11 @@ def generate_badge_mini(request):
                rate=handle_set.rate,
                now_rate=handle_set.now_rate,
                needed_rate=handle_set.needed_rate,
-               percentage=handle_set.percentage,
+               percentage_text=handle_set.percentage_text,
+               progress_text=handle_set.progress_text,
                bar_size=handle_set.bar_size)
     logger.info('[/generate_badge/mini ] user: {}, tier: {}'.format(url_set.boj_name, handle_set.tier_title))
-    return badge_response(svg, handle_set.tier_title, max_age=86400)
+    return badge_response(svg, handle_set, max_age=86400)
 
 
 @require_safe
@@ -705,8 +688,8 @@ def generate_badge_pastel(request):
     <g class="rate-bar" style="animation-delay: 800ms">
         <line x1="35" y1="142" x2="{bar_size}" y2="142" stroke-width="4" stroke="#333333" stroke-linecap="round" stroke-opacity="60%"/>
     </g>
-    <text x="297" y="142" alignment-baseline="middle" class="percentage">{percentage}%</text>
-    <text x="293" y="157" class="progress" text-anchor="end">{now_rate} / {needed_rate}</text>
+    <text x="297" y="142" alignment-baseline="middle" class="percentage">{percentage_text}</text>
+    <text x="293" y="157" class="progress" text-anchor="end">{progress_text}</text>
 </svg>
     '''.format(color1=BACKGROUND_COLOR_PASTEL[handle_set.tier_title][0],
                color2=BACKGROUND_COLOR_PASTEL[handle_set.tier_title][1],
@@ -719,8 +702,9 @@ def generate_badge_pastel(request):
                rate=handle_set.rate,
                now_rate=handle_set.now_rate,
                needed_rate=handle_set.needed_rate,
-               percentage=handle_set.percentage,
+               percentage_text=handle_set.percentage_text,
+               progress_text=handle_set.progress_text,
                bar_size=handle_set.bar_size)
 
     logger.info('[/generate_badge/pastel] user: {}, tier: {}'.format(url_set.boj_name, handle_set.tier_title))
-    return badge_response(svg, handle_set.tier_title)
+    return badge_response(svg, handle_set)
